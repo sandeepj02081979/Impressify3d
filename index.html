@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impressify3D — Precision 3D Printing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --black: #1d1d1f;
+    --gray-mid: #6e6e73;
+    --gray-light: #f5f5f7;
+    --gray-border: #d2d2d7;
+    --blue: #0071e3;
+    --blue-hover: #0077ed;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font);
+    color: var(--black);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 0.5px solid rgba(0,0,0,0.12);
+  }
+
+  .nav-logo {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--black);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+    color: var(--black);
+    text-decoration: none;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  .nav-cta {
+    font-size: 13px;
+    background: var(--blue);
+    color: white;
+    padding: 7px 16px;
+    border-radius: 980px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--blue-hover); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 24px 80px;
+    background: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 18px;
+  }
+
+  .hero-title {
+    font-size: clamp(42px, 7vw, 84px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.0;
+    color: var(--black);
+    max-width: 900px;
+    margin-bottom: 24px;
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 2.2vw, 22px);
+    font-weight: 400;
+    color: var(--gray-mid);
+    max-width: 640px;
+    line-height: 1.5;
+    margin-bottom: 44px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    font-family: var(--font);
+    font-size: 17px;
+    font-weight: 500;
+    background: var(--blue);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 980px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--blue-hover); transform: scale(1.01); }
+
+  .btn-ghost {
+    font-family: var(--font);
+    font-size: 17px;
+    font-weight: 500;
+    background: transparent;
+    color: var(--blue);
+    border: none;
+    padding: 14px 28px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-inline-block;
+    transition: color 0.2s;
+  }
+  .btn-ghost::after { content: ' →'; }
+  .btn-ghost:hover { color: var(--blue-hover); }
+
+  /* Layer animation — signature element */
+  .layers-container {
+    margin-top: 70px;
+    position: relative;
+    width: 320px;
+    height: 200px;
+    perspective: 800px;
+  }
+
+  .layer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+    height: 28px;
+    border-radius: 6px;
+    opacity: 0;
+    animation: riseLayer 0.5s ease forwards;
+  }
+  .layer:nth-child(1) { bottom: 0px; background: #0071e3; animation-delay: 0.1s; }
+  .layer:nth-child(2) { bottom: 30px; background: #1a8ce0; animation-delay: 0.25s; width: 230px; }
+  .layer:nth-child(3) { bottom: 60px; background: #34a2dd; animation-delay: 0.4s; width: 200px; }
+  .layer:nth-child(4) { bottom: 90px; background: #54b7d8; animation-delay: 0.55s; width: 170px; }
+  .layer:nth-child(5) { bottom: 120px; background: #78ccd3; animation-delay: 0.7s; width: 140px; }
+  .layer:nth-child(6) { bottom: 150px; background: #9edece; animation-delay: 0.85s; width: 110px; }
+  .layer:nth-child(7) { bottom: 180px; background: #c5f0c9; animation-delay: 1.0s; width: 80px; border-radius: 6px 6px 4px 4px; }
+  .layer-label {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--gray-mid);
+    white-space: nowrap;
+    opacity: 0;
+    animation: fadeIn 0.5s ease 1.2s forwards;
+  }
+
+  @keyframes riseLayer {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0px); }
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* ── SECTION BASE ── */
+  section {
+    padding: 100px 24px;
+  }
+
+  .section-inner {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .section-eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--black);
+    margin-bottom: 16px;
+  }
+
+  .section-body {
+    font-size: 19px;
+    font-weight: 400;
+    color: var(--gray-mid);
+    line-height: 1.55;
+    max-width: 640px;
+  }
+
+  /* ── STAT STRIP ── */
+  .stat-strip {
+    background: var(--gray-light);
+    padding: 64px 24px;
+  }
+
+  .stat-grid {
+    max-width: 860px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--gray-border);
+    border: 1px solid var(--gray-border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .stat-cell {
+    background: var(--gray-light);
+    padding: 36px 28px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--black);
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: var(--gray-mid);
+    margin-top: 4px;
+  }
+
+  /* ── SERVICES ── */
+  .services-section {
+    background: var(--white);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2px;
+    margin-top: 56px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--gray-border);
+    background: var(--gray-border);
+  }
+
+  .service-card {
+    background: var(--white);
+    padding: 40px 32px;
+    transition: background 0.2s;
+  }
+  .service-card:hover { background: #fafafa; }
+
+  .service-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--gray-light);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .service-title {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--black);
+    margin-bottom: 10px;
+  }
+
+  .service-desc {
+    font-size: 15px;
+    color: var(--gray-mid);
+    line-height: 1.55;
+  }
+
+  /* ── PHILOSOPHY ── */
+  .philosophy-section {
+    background: var(--black);
+    color: white;
+  }
+
+  .philosophy-section .section-title { color: white; }
+  .philosophy-section .section-eyebrow { color: #86b9ff; }
+  .philosophy-section .section-body { color: rgba(255,255,255,0.6); }
+
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    margin-top: 56px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .pillar {
+    background: #1d1d1f;
+    padding: 40px 28px;
+  }
+
+  .pillar-num {
+    font-size: 13px;
+    font-weight: 600;
+    color: #86b9ff;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+
+  .pillar-title {
+    font-size: 19px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 10px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .pillar-body {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.55;
+  }
+
+  /* ── TOOLS ── */
+  .tools-section {
+    background: var(--gray-light);
+  }
+
+  .tools-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .tool-pill {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--black);
+    background: white;
+    border: 1px solid var(--gray-border);
+    padding: 8px 18px;
+    border-radius: 980px;
+  }
+
+  /* ── ABOUT SPLIT ── */
+  .about-section { background: var(--white); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    margin-top: 0;
+  }
+
+  @media (max-width: 680px) {
+    .about-grid { grid-template-columns: 1fr; }
+  }
+
+  .about-visual {
+    background: linear-gradient(135deg, #e0eeff 0%, #d0f0e8 100%);
+    border-radius: 24px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .about-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230071e3' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .values-list {
+    list-style: none;
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .values-list li {
+    font-size: 16px;
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .values-list li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--blue);
+    flex-shrink: 0;
+  }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    background: var(--gray-light);
+    text-align: center;
+    padding: 120px 24px;
+  }
+
+  .cta-section .section-title {
+    margin: 0 auto 16px;
+    max-width: 700px;
+  }
+  .cta-section .section-body {
+    margin: 0 auto 44px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--gray-light);
+    border-top: 0.5px solid var(--gray-border);
+    padding: 40px 24px;
+  }
+
+  .footer-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+  }
+
+  @media (max-width: 680px) {
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+
+  .footer-brand {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--black);
+    margin-bottom: 10px;
+  }
+
+  .footer-tagline {
+    font-size: 13px;
+    color: var(--gray-mid);
+    line-height: 1.55;
+    max-width: 220px;
+  }
+
+  .footer-col-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 14px;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+    color: var(--gray-mid);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--black); }
+
+  .footer-bottom {
+    max-width: 980px;
+    margin: 32px auto 0;
+    padding-top: 20px;
+    border-top: 0.5px solid var(--gray-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .footer-bottom p {
+    font-size: 12px;
+    color: var(--gray-mid);
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE NAV ── */
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Impressify3D</a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="https://www.impressify3d.com/product-gallery" target="_blank">Gallery</a></li>
+    <li><a href="mailto:impressify3d@gmail.com">Contact</a></li>
+  </ul>
+  <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="nav-cta">Request a Quote</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <p class="hero-eyebrow">3D Printing &amp; Design Studio</p>
+  <h1 class="hero-title">Transforming Ideas Into Reality</h1>
+  <p class="hero-sub">From concept to creation — precision 3D modeling, prototyping, and printing for artists, architects, engineers, and innovators.</p>
+  <div class="hero-actions">
+    <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="btn-primary">Request a Quote</a>
+    <a href="#services" class="btn-ghost">Our Services</a>
+  </div>
+
+  <!-- Signature: layer-by-layer animation -->
+  <div class="layers-container" aria-hidden="true">
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <div class="layer"></div>
+    <p class="layer-label">One layer at a time.</p>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stat-strip">
+  <div class="stat-grid reveal">
+    <div class="stat-cell">
+      <div class="stat-num">500+</div>
+      <div class="stat-label">Projects delivered</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Pro-grade tools</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">48h</div>
+      <div class="stat-label">Rapid prototype turnaround</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Custom every time</div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services-section" id="services">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal">What we do</p>
+    <h2 class="section-title reveal">End-to-end printing services,<br>tailored to your vision.</h2>
+    <p class="section-body reveal">We handle every stage — from your initial sketch to a finished, production-ready piece.</p>
+
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">✏️</div>
+        <h3 class="service-title">3D Design &amp; Modeling</h3>
+        <p class="service-desc">From concept sketches to CAD-ready digital models, our designers convert your vision into precision 3D data ready for production.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">⚡</div>
+        <h3 class="service-title">Prototyping &amp; Rapid Printing</h3>
+        <p class="service-desc">Need your prototype fast? We deliver quick-turn prints with industry-grade accuracy, ready for testing and validation.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🏭</div>
+        <h3 class="service-title">Mass Production &amp; Finishing</h3>
+        <p class="service-desc">High-quality prints at scale — across multiple materials, textures, and post-processing finishes for professional-grade outcomes.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🎨</div>
+        <h3 class="service-title">Custom Art &amp; Miniatures</h3>
+        <p class="service-desc">Personal sculptures, architectural models, or collectibles — printed with unmatched detail and creative precision.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy-section">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal">Our thinking</p>
+    <h2 class="section-title reveal">Built on four core ideas.</h2>
+    <p class="section-body reveal">Everything we make comes back to these principles.</p>
+
+    <div class="pillars-grid">
+      <div class="pillar reveal">
+        <p class="pillar-num">01</p>
+        <h3 class="pillar-title">Creativity at Its Core</h3>
+        <p class="pillar-body">Precision and artistry together — turning even the most imaginative visions into tangible, meaningful products.</p>
+      </div>
+      <div class="pillar reveal">
+        <p class="pillar-num">02</p>
+        <h3 class="pillar-title">Personalized to You</h3>
+        <p class="pillar-body">Every print reflects individual creativity. We use precision 3D design to create tailored products that are uniquely yours.</p>
+      </div>
+      <div class="pillar reveal">
+        <p class="pillar-num">03</p>
+        <h3 class="pillar-title">Sustainable Materials</h3>
+        <p class="pillar-body">Choosing the right filament means strength, detail, and minimal environmental impact — innovation without compromise.</p>
+      </div>
+      <div class="pillar reveal">
+        <p class="pillar-num">04</p>
+        <h3 class="pillar-title">Future-Ready</h3>
+        <p class="pillar-body">AI-powered printers, automated quality control, and on-time delivery — pushing the boundaries of design and material science.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="tools-section">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal">Technology</p>
+    <h2 class="section-title reveal">Powered by<br>industry-leading tools.</h2>
+    <p class="section-body reveal">We work with the same software trusted by professionals across engineering, architecture, and industrial design.</p>
+    <div class="tools-pills reveal">
+      <span class="tool-pill">Blender</span>
+      <span class="tool-pill">Fusion 360</span>
+      <span class="tool-pill">SolidWorks</span>
+      <span class="tool-pill">Bambu Lab</span>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div>
+        <p class="section-eyebrow reveal">About Impressify3D</p>
+        <h2 class="section-title reveal">Engineering meets artistry.</h2>
+        <p class="section-body reveal">Founded by creators passionate about design, technology, and innovation — we empower businesses, students, and makers to bring their concepts into the physical world through affordable, high-quality 3D printing.</p>
+        <ul class="values-list reveal">
+          <li>Creativity through technology</li>
+          <li>Precision with purpose</li>
+          <li>Partnership-driven innovation</li>
+        </ul>
+      </div>
+      <div class="about-visual reveal" aria-hidden="true">
+        🖨️
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-eyebrow reveal">Get started</div>
+  <h2 class="section-title reveal">Shape tomorrow with us.</h2>
+  <p class="section-body reveal">Join the growing community of creators, architects, and engineers who bring their ideas to life with Impressify3D.</p>
+  <div class="hero-actions">
+    <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="btn-primary">Request a Quote</a>
+    <a href="mailto:impressify3d@gmail.com" class="btn-ghost">Email Us</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">Impressify3D</p>
+      <p class="footer-tagline">Precision 3D printing and design services. Turning ideas into tangible realities, one layer at a time.</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Services</p>
+      <ul class="footer-links">
+        <li><a href="#services">3D Modeling</a></li>
+        <li><a href="#services">Prototyping</a></li>
+        <li><a href="#services">Mass Production</a></li>
+        <li><a href="#services">Custom Art</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Company</p>
+      <ul class="footer-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="https://www.impressify3d.com/product-gallery" target="_blank">Gallery</a></li>
+        <li><a href="https://www.impressify3d.com/wallpapers" target="_blank">Wallpapers</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Contact</p>
+      <ul class="footer-links">
+        <li><a href="mailto:impressify3d@gmail.com">impressify3d@gmail.com</a></li>
+        <li><a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank">Request a Quote</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Copyright © 2025 Impressify3D. All rights reserved.</p>
+    <p>Built with precision. Delivered with care.</p>
+  </div>
+</footer>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
