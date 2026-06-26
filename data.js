@@ -53,7 +53,7 @@ const FALLBACK_ITEMS = [
     title: 'Jharokha – The Royal Balcony',
     category: 'heritage',
     tag_label: 'Heritage',
-    image_drive_id: 'https://drive.google.com/thumbnail?id=19MYiRj0e4UkZjj-LbBTEQFfox_nOxhPD&sz=w1200',
+    image_drive_id: '19MYiRj0e4UkZjj-LbBTEQFfox_nOxhPD',
     gallery_desc: 'Intricate carvings inspired by Rajasthani and Mughal architecture — ornate jali work, floral motifs, and geometric patterns reflecting royal elegance.',
     wallpaper_desc: 'Royal Rajasthani jali patterns rendered in stunning 3D — a regal addition to any screen.',
     featured: false,
