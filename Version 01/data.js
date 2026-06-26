@@ -3,12 +3,38 @@
  *  Impressify3D  ·  Shared Content Layer
  *  data.js — single source of truth for all pages
  * ─────────────────────────────────────────────────────────────
+ *
+ *  HOW TO CONNECT YOUR GOOGLE SHEET
+ *  ─────────────────────────────────
+ *  1. Open your Google Sheet and go to File → Share → Publish to web
+ *     → Sheet1 → CSV → Publish  (copy the URL, you only need the Sheet ID from it)
+ *  2. Paste your Sheet ID into SHEET_ID below (the long string between /d/ and /edit)
+ *  3. Set USE_SHEET = true
+ *  4. Commit & push — the pages now read live from the sheet on every load.
+ *
+ *  SHEET COLUMN ORDER  (Row 1 = headers, data from Row 2 onward)
+ *  ─────────────────────────────────────────────────────────────
+ *  A: id              — unique slug, e.g. "mandir-01"
+ *  B: title           — "Wall-Mounted Mandir – Divine Elegance"
+ *  C: category        — comma-separated: "spiritual" or "heritage,architecture"
+ *  D: tag_label       — short display tag: "Spiritual · Featured"
+ *  E: image_drive_id  — Google Drive file ID (the part after /d/ in the share URL)
+ *  F: gallery_desc    — description shown on the Product Gallery page
+ *  G: wallpaper_desc  — description shown on the Wallpapers page (can differ)
+ *  H: featured        — "true" or blank  → makes this item a hero/featured card
+ *  I: wallpaper_res   — resolution label for wallpapers, e.g. "4K · 3840×2160"
+ *  J: wallpaper_tags  — comma-separated style tags: "Heritage,Detailed,Dark"
+ *
+ * ─────────────────────────────────────────────────────────────
  */
 
 const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE';  // ← paste your Sheet ID
 const USE_SHEET = false;                         // ← set to true when ready
 
 // ── FALLBACK DATA ─────────────────────────────────────────────
+// Used when USE_SHEET = false, or if the sheet fetch fails.
+// Edit this directly while developing; the structure mirrors the sheet columns.
+
 const FALLBACK_ITEMS = [
   {
     id: 'mandir-01',
@@ -97,8 +123,11 @@ const FALLBACK_ITEMS = [
 ];
 
 // ── IMAGE URL HELPER ──────────────────────────────────────────
+// Converts a Drive file ID into a usable thumbnail URL.
+// sz=w1200 for gallery cards; sz=w1920 for wallpaper previews.
 function driveUrl(fileId, size = 'w1200') {
   if (!fileId || fileId.startsWith('REPLACE')) {
+    // Placeholder gradient while IDs aren't filled in yet
     return `https://via.placeholder.com/1200x900/f5f5f7/0071e3?text=Image+pending`;
   }
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=${size}`;
@@ -116,8 +145,9 @@ async function loadItems() {
     if (!res.ok) throw new Error('Sheet fetch failed');
     const csv = await res.text();
 
-    const rows = csv.trim().split('\n').slice(1);
+    const rows = csv.trim().split('\n').slice(1); // skip header row
     return rows.map(row => {
+      // Handle quoted CSV fields properly
       const cols = row.match(/(".*?"|[^,]+)(?=,|$)/g)?.map(c => c.replace(/^"|"$/g, '').trim()) ?? [];
       return {
         id:              cols[0] || '',
@@ -131,35 +161,9 @@ async function loadItems() {
         wallpaper_res:   cols[8] || '4K · 3840×2160',
         wallpaper_tags:  cols[9] || '',
       };
-    }).filter(item => item.id);
+    }).filter(item => item.id); // skip empty rows
   } catch (err) {
     console.warn('Google Sheet unavailable, using fallback data.', err);
     return FALLBACK_ITEMS;
   }
 }
-
-// ── NAVIGATION INJECTOR ────────────────────────────────────────
-function initGlobalNavigation() {
-  const navLinksContainer = document.querySelector('.nav-links');
-  if (!navLinksContainer) return;
-
-  const path = window.location.pathname;
-  const isHomePage = path === '/' || path.endsWith('index.html') || path.endsWith('home') || (!path.includes('ProductGallery') && !path.includes('Wallpapers'));
-
-  const homeBase = isHomePage ? '' : 'index.html';
-  const galleryUrl = 'ProductGallery.html';
-  const wallpapersUrl = 'Wallpapers.html';
-
-  const isGalleryActive = path.includes('ProductGallery');
-  const isWallpapersActive = path.includes('Wallpapers');
-
-  navLinksContainer.innerHTML = `
-    <li><a href="${homeBase}#services">Services</a></li>
-    <li><a href="${homeBase}#about">About</a></li>
-    <li><a href="${galleryUrl}" class="${isGalleryActive ? 'active' : ''}">Gallery</a></li>
-    <li><a href="${wallpapersUrl}" class="${isWallpapersActive ? 'active' : ''}">Wallpapers</a></li>
-    <li><a href="mailto:impressify3d@gmail.com">Contact</a></li>
-  `;
-}
-
-document.addEventListener('DOMContentLoaded', initGlobalNavigation);
