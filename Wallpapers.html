@@ -22,359 +22,122 @@
   }
 
   html { scroll-behavior: smooth; }
-
-  body {
-    font-family: var(--font);
-    color: var(--black);
-    background: var(--white);
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
+  body { font-family: var(--font); color: var(--black); background: var(--white); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
   /* ── NAV ── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 22px;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 0.5px solid rgba(0,0,0,0.12);
-  }
-
-  .nav-logo {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--black);
-    letter-spacing: -0.02em;
-    text-decoration: none;
-  }
-
-  .nav-links {
-    display: flex;
-    gap: 28px;
-    list-style: none;
-  }
-
-  .nav-links a {
-    font-size: 13px;
-    color: var(--black);
-    text-decoration: none;
-    opacity: 0.85;
-    transition: opacity 0.2s;
-  }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; background: rgba(255,255,255,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 0.5px solid rgba(0,0,0,0.12); }
+  .nav-logo { font-size: 17px; font-weight: 600; color: var(--black); letter-spacing: -0.02em; text-decoration: none; }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--black); text-decoration: none; opacity: 0.85; transition: opacity 0.2s; }
   .nav-links a:hover { opacity: 1; }
   .nav-links a.active { opacity: 1; font-weight: 500; }
-
-  .nav-cta {
-    font-size: 13px;
-    background: var(--blue);
-    color: white;
-    padding: 7px 16px;
-    border-radius: 980px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background 0.2s;
-  }
+  .nav-cta { font-size: 13px; background: var(--blue); color: white; padding: 7px 16px; border-radius: 980px; text-decoration: none; font-weight: 500; transition: background 0.2s; }
   .nav-cta:hover { background: var(--blue-hover); }
 
   /* ── PAGE HERO ── */
-  .page-hero {
-    padding: 120px 24px 72px;
-    text-align: center;
-    background: var(--white);
-  }
+  .page-hero { padding: 120px 24px 72px; text-align: center; background: var(--white); }
+  .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 18px; }
+  .page-hero h1 { font-size: clamp(38px, 6vw, 72px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.0; color: var(--black); max-width: 760px; margin: 0 auto 20px; }
+  .page-hero p { font-size: clamp(15px, 2vw, 19px); color: var(--gray-mid); max-width: 580px; margin: 0 auto; line-height: 1.55; }
 
-  .hero-eyebrow {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--blue);
-    margin-bottom: 18px;
-  }
+  /* ── GALLERY SECTION ── */
+  .gallery-section { padding: 64px 24px 100px; max-width: 1100px; margin: 0 auto; }
+  .gallery-count { font-size: 13px; color: var(--gray-mid); margin-bottom: 36px; display: block; }
 
-  .page-hero h1 {
-    font-size: clamp(38px, 6vw, 72px);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.0;
-    color: var(--black);
-    max-width: 760px;
-    margin: 0 auto 20px;
-  }
+  /* Loading */
+  .loading-state { text-align: center; padding: 80px 24px; color: var(--gray-mid); font-size: 15px; }
+  .loading-dots::after { content: ''; animation: dots 1.2s steps(3,end) infinite; }
+  @keyframes dots { 0%,20%{content:'.'} 40%{content:'..'} 60%,100%{content:'...'} }
 
-  .page-hero p {
-    font-size: clamp(15px, 2vw, 19px);
-    font-weight: 400;
-    color: var(--gray-mid);
-    max-width: 580px;
-    margin: 0 auto 40px;
-    line-height: 1.55;
-  }
-
-  /* ── WALLPAPER GALLERY SECTION ── */
-  .gallery-section {
-    padding: 20px 24px 100px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
+  /* ── WALLPAPER GRID ── */
   .gallery {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
-  }
-
-  @media (max-width: 900px) {
-    .gallery { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 600px) {
-    .gallery { grid-template-columns: 1fr; }
-  }
-
-  .gallery-item {
-    background: var(--white);
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2px;
+    background: var(--gray-border);
     border: 1px solid var(--gray-border);
     border-radius: 20px;
     overflow: hidden;
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
   }
+  @media (max-width: 660px) { .gallery { grid-template-columns: 1fr; } }
 
-  .gallery-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-  }
+  .gallery-item { background: var(--white); display: flex; flex-direction: column; transition: background 0.2s; }
+  .gallery-item:hover { background: #fafafa; }
 
   .gallery-img-wrapper {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16/9;
     overflow: hidden;
     background: var(--gray-light);
-    cursor: pointer;
-  }
-
-  .gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.5s ease;
-  }
-
-  .gallery-item:hover img {
-    transform: scale(1.04);
-  }
-
-  .gallery-body {
-    padding: 20px 24px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    flex-grow: 1;
-  }
-
-  .image-title {
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--black);
-  }
-
-  .actions-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: auto;
-  }
-
-  .view-btn {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--blue);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  .view-btn:hover { color: var(--blue-hover); }
-
-  .download-btn {
-    font-size: 12px;
-    font-weight: 500;
-    background: var(--gray-light);
-    color: var(--black);
-    padding: 6px 14px;
-    border-radius: 980px;
-    text-decoration: none;
-    transition: background 0.2s;
-  }
-  .download-btn:hover { background: var(--gray-border); }
-
-  /* ── LIGHTBOX MODAL OVERLAY ── */
-  .lightbox {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 500;
-    background: rgba(0,0,0,0.9);
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-  .lightbox.open { display: flex; }
-
-  .lightbox-inner {
+    cursor: zoom-in;
     position: relative;
-    max-width: 900px;
-    max-height: 85vh;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    background: var(--white);
   }
+  .gallery-img-wrapper img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+  .gallery-item:hover .gallery-img-wrapper img { transform: scale(1.04); }
 
-  .lightbox-img-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .lightbox-img-container img {
-    max-width: 100%;
-    max-height: 75vh;
-    object-fit: contain;
-    display: block;
-  }
-
-  .lightbox-footer {
-    background: var(--white);
-    padding: 16px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid var(--gray-border);
-  }
-
-  .lightbox-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--black);
-  }
-
-  .lightbox-close {
+  /* Resolution badge */
+  .res-badge {
     position: absolute;
-    top: 16px; right: 16px;
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(4px);
-    cursor: pointer;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-    z-index: 10;
+    top: 10px; right: 10px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.05em;
+    background: rgba(0,0,0,0.55);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 980px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
-  .lightbox-close:hover { background: rgba(255,255,255,1); }
 
-  /* ── SCROLL REVEAL ── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .gallery-body { padding: 20px 20px 24px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+  .image-title { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--black); line-height: 1.25; }
+  .image-desc { font-size: 13px; color: var(--gray-mid); line-height: 1.55; flex: 1; }
+
+  /* Style tags */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .style-tag { font-size: 11px; font-weight: 500; color: var(--gray-mid); background: var(--gray-light); border: 1px solid var(--gray-border); padding: 3px 10px; border-radius: 980px; }
+
+  .actions-row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+  .view-btn { font-family: var(--font); font-size: 13px; font-weight: 500; background: var(--gray-light); color: var(--black); border: 1px solid var(--gray-border); padding: 7px 14px; border-radius: 980px; cursor: pointer; transition: background 0.2s; }
+  .view-btn:hover { background: var(--gray-border); }
+  .download-btn { font-family: var(--font); font-size: 13px; font-weight: 500; background: var(--blue); color: white; border: none; padding: 7px 14px; border-radius: 980px; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+  .download-btn:hover { background: var(--blue-hover); }
+
+  /* ── LIGHTBOX ── */
+  .lightbox { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.92); align-items: center; justify-content: center; padding: 24px; }
+  .lightbox.open { display: flex; }
+  .lightbox-inner { position: relative; max-width: 960px; width: 100%; background: var(--white); border-radius: 20px; overflow: hidden; }
+  .lightbox-img-container { width: 100%; background: #000; }
+  .lightbox-img-container img { width: 100%; max-height: 70vh; object-fit: contain; display: block; }
+  .lightbox-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 28px; gap: 16px; flex-wrap: wrap; }
+  .lightbox-title { font-size: 17px; font-weight: 600; color: var(--black); letter-spacing: -0.02em; }
+  .lightbox-desc { font-size: 13px; color: var(--gray-mid); margin-top: 4px; max-width: 500px; }
+  .lightbox-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: white; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; backdrop-filter: blur(6px); }
+  .lightbox-close:hover { background: rgba(255,255,255,0.25); }
 
   /* ── CTA STRIP ── */
-  .cta-strip {
-    background: var(--black);
-    text-align: center;
-    padding: 100px 24px;
-  }
+  .cta-strip { background: var(--black); text-align: center; padding: 100px 24px; }
   .cta-strip .hero-eyebrow { color: #86b9ff; }
-  .cta-strip h2 {
-    font-size: clamp(28px, 4vw, 52px);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-    color: white;
-    max-width: 640px;
-    margin: 12px auto 20px;
-  }
-  .cta-strip p {
-    font-size: 18px;
-    color: rgba(255,255,255,0.6);
-    max-width: 540px;
-    margin: 0 auto 40px;
-    line-height: 1.55;
-  }
-  .btn-primary {
-    font-family: var(--font);
-    font-size: 16px;
-    font-weight: 500;
-    background: var(--blue);
-    color: white;
-    border: none;
-    padding: 13px 26px;
-    border-radius: 980px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: background 0.2s;
-  }
+  .cta-strip h2 { font-size: clamp(28px,4vw,52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: white; max-width: 640px; margin: 12px auto 20px; }
+  .cta-strip p { font-size: 18px; color: rgba(255,255,255,0.6); max-width: 540px; margin: 0 auto 40px; line-height: 1.55; }
+  .btn-primary { font-family: var(--font); font-size: 16px; font-weight: 500; background: var(--blue); color: white; border: none; padding: 13px 26px; border-radius: 980px; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s; }
   .btn-primary:hover { background: var(--blue-hover); }
 
   /* ── FOOTER ── */
-  footer {
-    background: var(--gray-light);
-    border-top: 0.5px solid var(--gray-border);
-    padding: 40px 24px;
-  }
-  .footer-inner {
-    max-width: 980px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 40px;
-  }
-  @media (max-width: 680px) {
-    .footer-inner { grid-template-columns: 1fr 1fr; }
-    .nav-links { display: none; }
-  }
+  footer { background: var(--gray-light); border-top: 0.5px solid var(--gray-border); padding: 40px 24px; }
+  .footer-inner { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+  @media (max-width: 680px) { .footer-inner { grid-template-columns: 1fr 1fr; } .nav-links { display: none; } }
   .footer-brand { font-size: 16px; font-weight: 600; color: var(--black); margin-bottom: 10px; }
   .footer-tagline { font-size: 13px; color: var(--gray-mid); line-height: 1.55; max-width: 220px; }
   .footer-col-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--black); margin-bottom: 14px; }
   .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
   .footer-links a { font-size: 13px; color: var(--gray-mid); text-decoration: none; transition: color 0.2s; }
   .footer-links a:hover { color: var(--black); }
-  .footer-bottom {
-    max-width: 980px;
-    margin: 32px auto 0;
-    padding-top: 20px;
-    border-top: 0.5px solid var(--gray-border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
+  .footer-bottom { max-width: 980px; margin: 32px auto 0; padding-top: 20px; border-top: 0.5px solid var(--gray-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
   .footer-bottom p { font-size: 12px; color: var(--gray-mid); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
@@ -394,23 +157,29 @@
 <div class="page-hero">
   <p class="hero-eyebrow">Free Downloads</p>
   <h1>Backdrops for your display.</h1>
-  <p>Bring precision art styles into your digital workspace. High-resolution design backdrops rendered out for your desktop and screens.</p>
+  <p>Bring precision art to your digital workspace. High-resolution renders from every Impressify3D piece — ready for desktop and screen.</p>
 </div>
 
 <div class="gallery-section">
+  <span class="gallery-count" id="gallery-count"></span>
   <div class="gallery reveal" id="wallpaper-gallery">
-    </div>
+    <div class="loading-state" style="grid-column:1/-1"><span class="loading-dots">Loading</span></div>
+  </div>
 </div>
 
+<!-- Lightbox -->
 <div class="lightbox" id="lightbox-modal">
   <button class="lightbox-close" id="lightbox-close-btn">&times;</button>
   <div class="lightbox-inner">
     <div class="lightbox-img-container">
-      <img src="" id="lightbox-active-img" alt="Active Wallpaper Visual">
+      <img src="" id="lightbox-active-img" alt="">
     </div>
     <div class="lightbox-footer">
-      <div class="lightbox-title" id="lightbox-active-title">Wallpaper Title</div>
-      <a href="#" class="download-btn" id="lightbox-dl-link" target="_blank" download>Open High-Res</a>
+      <div>
+        <div class="lightbox-title" id="lightbox-active-title"></div>
+        <div class="lightbox-desc" id="lightbox-active-desc"></div>
+      </div>
+      <a href="#" class="download-btn" id="lightbox-dl-link" target="_blank">Open Full-Res ↗</a>
     </div>
   </div>
 </div>
@@ -459,81 +228,80 @@
   </div>
 </footer>
 
+<script src="data.js"></script>
+
 <script>
-  // STEP 1: Wallpaper data list
-  const wallpapers = [
-    { title: "Divine Elegance", url: "https://res.cloudinary.com/dfornki2u/image/upload/v1761749328/HD_Wall_Mandir_jb6yrs.png" },
-    { title: "The Royal Balcony", url: "https://res.cloudinary.com/dfornki2u/image/upload/v1761749323/HD_Jarokha_fh2tt9.png" },
-    { title: "Eternal Harmony", url: "https://res.cloudinary.com/dfornki2u/image/upload/v1761749325/HD_Mandir_Rounded_pbefqw.png" },
-    { title: "Timeless Tradition", url: "https://res.cloudinary.com/dfornki2u/image/upload/v1761749326/HD_Marathi_Wada_upixxt.png" },
-    { title: "City Wallpaper", url: "https://res.cloudinary.com/dfornki2u/image/upload/v1761749323/HD_Jarokha_fh2tt9.png" },
-    { title: "Majestic View", url: "https://res.cloudinary.com/dfornki2u/image/upload/v1761749323/HD_Jarokha_fh2tt9.png" },
-    { title: "Sacred Round", url: "https://res.cloudinary.com/dfornki2u/image/upload/v1761749325/HD_Mandir_Rounded1_i87i3k.png" },
-    { title: "Personalized Elegance", url: "https://res.cloudinary.com/dfornki2u/image/upload/v1761749327/HD_Text_eankmc.png" }
-  ];
-
-  // STEP 2: Dynamically build layout
-  const gallery = document.getElementById('wallpaper-gallery');
-  
-  wallpapers.forEach((wp, index) => {
-    const item = document.createElement('div');
-    item.className = 'gallery-item';
-    item.innerHTML = `
-      <div class="gallery-img-wrapper" onclick="openLightbox(${index})">
-        <img src="${wp.url}" alt="${wp.title}" loading="lazy">
-      </div>
-      <div class="gallery-body">
-        <div class="image-title">${wp.title}</div>
-        <div class="actions-row">
-          <button class="view-btn" onclick="openLightbox(${index})">View Fullscreen</button>
-          <a href="${wp.url}" target="_blank" class="download-btn">Open Link</a>
-        </div>
-      </div>
-    `;
-    gallery.appendChild(item);
-  });
-
-  // STEP 3: Lightbox logic elements
-  const modal = document.getElementById('lightbox-modal');
+(async () => {
+  const gallery   = document.getElementById('wallpaper-gallery');
+  const countEl   = document.getElementById('gallery-count');
+  const modal     = document.getElementById('lightbox-modal');
   const activeImg = document.getElementById('lightbox-active-img');
   const activeTitle = document.getElementById('lightbox-active-title');
-  const dlLink = document.getElementById('lightbox-dl-link');
-  const closeBtn = document.getElementById('lightbox-close-btn');
+  const activeDesc  = document.getElementById('lightbox-active-desc');
+  const dlLink    = document.getElementById('lightbox-dl-link');
+  const closeBtn  = document.getElementById('lightbox-close-btn');
 
+  // 1. Load data
+  const allItems = await loadItems();
+  gallery.innerHTML = '';
+  countEl.textContent = allItems.length + ' wallpapers';
+
+  // 2. Build cards
+  allItems.forEach((item, idx) => {
+    // Wallpapers page uses item.wallpaper_url if present, else falls back to Drive thumbnail
+    // wallpaper_url = column K in the sheet (full Cloudinary or any CDN URL)
+    const previewUrl  = item.wallpaper_url || driveUrl(item.image_drive_id, 'w1200');
+    const fullResUrl  = item.wallpaper_url || driveUrl(item.image_drive_id, 'w3840');
+    const tags        = (item.wallpaper_tags || '').split(',').map(t => t.trim()).filter(Boolean);
+    const res         = item.wallpaper_res || '4K · 3840×2160';
+
+    const el = document.createElement('div');
+    el.className = 'gallery-item';
+    el.innerHTML = `
+      <div class="gallery-img-wrapper" onclick="openLightbox(${idx})">
+        <img src="${previewUrl}" alt="${item.title}" loading="lazy">
+        <span class="res-badge">${res}</span>
+      </div>
+      <div class="gallery-body">
+        <div class="image-title">${item.title}</div>
+        <div class="image-desc">${item.wallpaper_desc}</div>
+        ${tags.length ? `<div class="tag-row">${tags.map(t => `<span class="style-tag">${t}</span>`).join('')}</div>` : ''}
+        <div class="actions-row">
+          <button class="view-btn" onclick="openLightbox(${idx})">Preview</button>
+          <a href="${fullResUrl}" target="_blank" class="download-btn">Open Full-Res ↗</a>
+        </div>
+      </div>`;
+    gallery.appendChild(el);
+  });
+
+  // 3. Lightbox
   window.openLightbox = function(idx) {
-    const data = wallpapers[idx];
-    activeImg.src = data.url;
-    activeTitle.textContent = data.title;
-    dlLink.href = data.url;
+    const item = allItems[idx];
+    const full = item.wallpaper_url || driveUrl(item.image_drive_id, 'w3840');
+    activeImg.src = item.wallpaper_url || driveUrl(item.image_drive_id, 'w1920');
+    activeTitle.textContent = item.title;
+    activeDesc.textContent  = item.wallpaper_desc;
+    dlLink.href = full;
     modal.classList.add('open');
-    document.body.style.overflow = 'hidden'; // block page scroll
+    document.body.style.overflow = 'hidden';
   };
 
   function closeLightbox() {
     modal.classList.remove('open');
-    document.body.style.overflow = ''; // restore scrolling
+    document.body.style.overflow = '';
     activeImg.src = '';
   }
 
   closeBtn.addEventListener('click', closeLightbox);
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeLightbox();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) closeLightbox();
-  });
+  modal.addEventListener('click', e => { if (e.target === modal) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeLightbox(); });
 
-  // Scroll reveal trigger
-  const revealEls = document.querySelectorAll('.reveal');
+  // 4. Scroll reveal
   const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        obs.unobserve(e.target);
-      }
-    });
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
   }, { threshold: 0.05 });
-  revealEls.forEach(el => obs.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+})();
 </script>
 </body>
 </html>
