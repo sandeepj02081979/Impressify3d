@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impressify3D — The Creative Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --black: #1d1d1f;
+    --gray-mid: #6e6e73;
+    --gray-light: #f5f5f7;
+    --gray-border: #d2d2d7;
+    --blue: #0071e3;
+    --blue-hover: #0077ed;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --panel-w: 380px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    color: var(--black);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    height: 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 0.5px solid rgba(0,0,0,0.12);
+  }
+  .nav-logo { font-size: 17px; font-weight: 600; color: var(--black); letter-spacing: -0.02em; text-decoration: none; }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--black); text-decoration: none; opacity: 0.85; transition: opacity 0.2s; }
+  .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 500; }
+  .nav-cta { font-size: 13px; background: var(--blue); color: white; padding: 7px 16px; border-radius: 980px; text-decoration: none; font-weight: 500; transition: background 0.2s; }
+  .nav-cta:hover { background: var(--blue-hover); }
+  @media (max-width: 600px) { .nav-links { display: none; } }
+
+  /* ── PAGE HERO ── */
+  .page-hero {
+    padding: 120px 24px 72px;
+    text-align: center;
+    background: var(--white);
+  }
+  .hero-eyebrow {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--blue); margin-bottom: 18px;
+  }
+  .page-hero h1 {
+    font-size: clamp(38px, 6vw, 68px);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1.0;
+    color: var(--black); max-width: 760px;
+    margin: 0 auto 20px;
+  }
+  .page-hero p {
+    font-size: clamp(15px, 2vw, 19px);
+    color: var(--gray-mid); max-width: 560px;
+    margin: 0 auto; line-height: 1.55;
+  }
+
+  /* ── ROOM SECTION ── */
+  .room-section {
+    padding: 60px 24px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* Instruction bar */
+  .room-instruction {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--gray-mid);
+    margin-bottom: 24px;
+    padding: 12px 18px;
+    background: var(--gray-light);
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    width: fit-content;
+  }
+  .room-instruction .dot-preview {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.2);
+    flex-shrink: 0;
+  }
+
+  /* Room image wrapper — one image, hotspots overlaid */
+  .room-wrapper {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--gray-border);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+    background: var(--gray-light);
+  }
+
+  .room-wrapper img,
+  .room-wrapper picture {
+    width: 100%;
+    display: block;
+  }
+  .room-wrapper img {
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  /* ── HOTSPOTS ── */
+  .hotspot {
+    position: absolute;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+
+  .hotspot-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--white);
+    border: 2.5px solid var(--blue);
+    position: relative; z-index: 2;
+    transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .hotspot-ring {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid rgba(0,113,227,0.4);
+    animation: ripple 2.4s ease infinite;
+  }
+  .hotspot:hover .hotspot-dot,
+  .hotspot.active .hotspot-dot {
+    background: var(--blue);
+    transform: scale(1.25);
+  }
+  .hotspot:hover .hotspot-ring,
+  .hotspot.active .hotspot-ring {
+    border-color: rgba(0,113,227,0.7);
+    animation: none;
+  }
+
+  @keyframes ripple {
+    0%   { opacity: 0.7; transform: translate(-50%,-50%) scale(0.5); }
+    100% { opacity: 0;   transform: translate(-50%,-50%) scale(2.0); }
+  }
+
+  /* Tooltip label beside dot */
+  .hotspot-label {
+    position: absolute;
+    left: 24px; top: 50%;
+    transform: translateY(-50%);
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    color: var(--black);
+    font-size: 11px; font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.18s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  }
+  .hotspot:hover .hotspot-label { opacity: 1; }
+
+  /* number badge */
+  .hotspot-num {
+    position: absolute;
+    top: -8px; right: -8px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 3;
+    box-shadow: 0 1px 4px rgba(0,113,227,0.4);
+  }
+
+  /* ── PRODUCT STRIP ── */
+  .product-strip {
+    padding: 72px 24px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .strip-header { margin-bottom: 40px; }
+  .section-eyebrow {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--blue); margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(26px, 3.5vw, 44px);
+    font-weight: 700; letter-spacing: -0.03em; line-height: 1.1;
+    color: var(--black);
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: var(--gray-border);
+    border: 1px solid var(--gray-border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  @media (max-width: 780px) { .products-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 480px) { .products-grid { grid-template-columns: 1fr; } }
+
+  .product-card {
+    background: var(--white);
+    display: flex; flex-direction: column;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+  }
+  .product-card:hover { background: #fafafa; }
+  .product-card.active-card { background: #eef4fd; }
+
+  .product-card-badge {
+    position: absolute; top: 10px; left: 10px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--blue); color: white;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,113,227,0.35);
+    z-index: 2;
+  }
+
+  .product-card-img {
+    aspect-ratio: 4/3; overflow: hidden;
+    background: var(--gray-light);
+  }
+  .product-card-img img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+  }
+  .product-card:hover .product-card-img img { transform: scale(1.05); }
+
+  .product-card-body { padding: 18px 18px 22px; flex: 1; display: flex; flex-direction: column; }
+  .product-card-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--blue); margin-bottom: 6px;
+  }
+  .product-card-title {
+    font-size: 14px; font-weight: 600; color: var(--black);
+    line-height: 1.3; margin-bottom: 6px; letter-spacing: -0.01em;
+  }
+  .product-card-desc {
+    font-size: 12px; color: var(--gray-mid); line-height: 1.55; flex: 1;
+  }
+  .product-card-link {
+    font-size: 12px; font-weight: 500; color: var(--blue);
+    margin-top: 12px; display: inline-flex; align-items: center; gap: 3px;
+    text-decoration: none; transition: gap 0.15s;
+  }
+  .product-card-link::after { content: '→'; }
+  .product-card:hover .product-card-link { gap: 6px; }
+
+  /* ── SIDE PANEL ── */
+  .panel-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 299;
+    background: rgba(0,0,0,0.28);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  .panel-backdrop.open { display: block; }
+
+  .side-panel {
+    position: fixed; top: 0; right: 0;
+    width: var(--panel-w); max-width: 94vw;
+    height: 100vh;
+    background: var(--white);
+    border-left: 0.5px solid var(--gray-border);
+    box-shadow: -8px 0 40px rgba(0,0,0,0.12);
+    z-index: 300;
+    display: flex; flex-direction: column;
+    transform: translateX(calc(var(--panel-w) + 20px));
+    transition: transform 0.4s cubic-bezier(0.32, 0, 0.15, 1);
+    overflow-y: auto;
+  }
+  .side-panel.open { transform: translateX(0); }
+
+  .panel-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--gray-light);
+    border: 1px solid var(--gray-border);
+    cursor: pointer; font-size: 16px; color: var(--black);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s; z-index: 2;
+  }
+  .panel-close:hover { background: var(--gray-border); }
+
+  .panel-img-wrap {
+    width: 100%; aspect-ratio: 4/3;
+    overflow: hidden; background: var(--gray-light); flex-shrink: 0;
+  }
+  .panel-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+  }
+  .side-panel.open .panel-img-wrap img { transform: scale(1.03); }
+
+  .panel-body { padding: 28px 28px 40px; flex: 1; display: flex; flex-direction: column; }
+
+  .panel-tag {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--blue); margin-bottom: 10px;
+  }
+  .panel-title {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+    line-height: 1.2; color: var(--black); margin-bottom: 14px;
+  }
+  .panel-desc {
+    font-size: 14px; color: var(--gray-mid); line-height: 1.7;
+    flex: 1; margin-bottom: 20px;
+  }
+  .panel-room-note {
+    background: var(--gray-light);
+    border: 1px solid var(--gray-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px; color: var(--gray-mid);
+    line-height: 1.55; margin-bottom: 24px;
+  }
+  .panel-room-note strong { color: var(--black); }
+
+  .panel-cta { display: flex; flex-direction: column; gap: 10px; }
+  .btn-primary {
+    font-family: var(--font); font-size: 15px; font-weight: 500;
+    background: var(--blue); color: white; border: none;
+    padding: 13px 20px; border-radius: 980px; cursor: pointer;
+    text-decoration: none; text-align: center;
+    transition: background 0.2s, transform 0.15s;
+    display: block;
+  }
+  .btn-primary:hover { background: var(--blue-hover); transform: scale(1.01); }
+  .btn-ghost {
+    font-family: var(--font); font-size: 15px; font-weight: 500;
+    background: transparent; color: var(--blue);
+    border: 1px solid var(--gray-border);
+    padding: 12px 20px; border-radius: 980px; cursor: pointer;
+    text-decoration: none; text-align: center;
+    transition: border-color 0.2s, color 0.2s;
+    display: block;
+  }
+  .btn-ghost:hover { border-color: var(--blue); }
+
+  /* ── CTA STRIP ── */
+  .cta-strip {
+    background: var(--gray-light);
+    text-align: center; padding: 100px 24px;
+    border-top: 0.5px solid var(--gray-border);
+  }
+  .cta-strip .hero-eyebrow { color: var(--blue); margin-bottom: 14px; }
+  .cta-strip h2 {
+    font-size: clamp(28px, 4vw, 52px); font-weight: 700;
+    letter-spacing: -0.03em; line-height: 1.1;
+    color: var(--black); max-width: 580px; margin: 0 auto 16px;
+  }
+  .cta-strip p {
+    font-size: 17px; color: var(--gray-mid); max-width: 480px;
+    margin: 0 auto 40px; line-height: 1.55;
+  }
+  .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .cta-btns .btn-primary { display: inline-block; }
+  .cta-btns .btn-ghost-inline {
+    font-family: var(--font); font-size: 17px; font-weight: 500;
+    background: transparent; color: var(--blue); border: none;
+    padding: 14px 28px; cursor: pointer; text-decoration: none;
+    display: inline-block; transition: color 0.2s;
+  }
+  .cta-btns .btn-ghost-inline::after { content: ' →'; }
+  .cta-btns .btn-ghost-inline:hover { color: var(--blue-hover); }
+
+  /* ── FOOTER ── */
+  footer { background: var(--gray-light); border-top: 0.5px solid var(--gray-border); padding: 40px 24px; }
+  .footer-inner { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+  @media (max-width: 680px) { .footer-inner { grid-template-columns: 1fr 1fr; } }
+  .footer-brand { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--black); margin-bottom: 10px; }
+  .footer-tagline { font-size: 13px; color: var(--gray-mid); line-height: 1.55; max-width: 220px; }
+  .footer-col-title { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--black); margin-bottom: 14px; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-links a { font-size: 13px; color: var(--gray-mid); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--black); }
+  .footer-bottom { max-width: 980px; margin: 32px auto 0; padding-top: 20px; border-top: 0.5px solid var(--gray-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .footer-bottom p { font-size: 12px; color: var(--gray-mid); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 500px) { :root { --panel-w: 100vw; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Impressify3D</a>
+  <ul class="nav-links">
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="ProductGallery.html">Gallery</a></li>
+    <li><a href="Wallpapers.html">Wallpapers</a></li>
+    <li><a href="room.html" class="active">The Room</a></li>
+  </ul>
+  <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="nav-cta">Request a Quote</a>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <p class="hero-eyebrow">The Impressify Room</p>
+  <h1>Products in their<br>natural home.</h1>
+  <p>A curated 3D-rendered living space showcasing our pieces exactly as they live in your room. Tap any glowing dot to explore each product.</p>
+</div>
+
+<!-- ROOM WITH HOTSPOTS — single image, no duplicate -->
+<div class="room-section reveal">
+
+  <div class="room-instruction">
+    <span class="dot-preview"></span>
+    Tap the glowing dots to explore each product in the room
+  </div>
+
+  <div class="room-wrapper">
+    <!-- ONE image only -->
+    <picture>
+      <source srcset="room_2x.webp" type="image/webp">
+      <img src="room_2x.jpg" alt="Impressify3D Creative Room — 3D concept render showing products in a living space">
+    </picture>
+
+    <!--
+      HOTSPOT COORDINATES (% from top-left of image):
+      Measured from the uploaded image:
+        1. Wall Mandir/Lantern  — left wall, white piece  → left:13%, top:47%
+        2. Temple on coffee table — black table center    → left:52%, top:62%
+        3. Blue figurine — right side table               → left:83%, top:56%
+        4. Framed art — back wall above sofa              → left:72%, top:30%
+    -->
+
+    <!-- 1. Wall Mandir -->
+    <div class="hotspot" style="left:13%;top:47%;" data-product="0">
+      <div class="hotspot-ring"></div>
+      <div class="hotspot-dot">
+        <span class="hotspot-num">1</span>
+      </div>
+      <div class="hotspot-label">Wall Mandir</div>
+    </div>
+
+    <!-- 2. Temple miniature on coffee table -->
+    <div class="hotspot" style="left:52%;top:61%;" data-product="1">
+      <div class="hotspot-ring"></div>
+      <div class="hotspot-dot">
+        <span class="hotspot-num">2</span>
+      </div>
+      <div class="hotspot-label">Temple Miniature</div>
+    </div>
+
+    <!-- 3. Blue figurine on side table -->
+    <div class="hotspot" style="left:83%;top:55%;" data-product="2">
+      <div class="hotspot-ring"></div>
+      <div class="hotspot-dot">
+        <span class="hotspot-num">3</span>
+      </div>
+      <div class="hotspot-label">Blue Figurine</div>
+    </div>
+
+    <!-- 4. Framed wall art -->
+    <div class="hotspot" style="left:72%;top:30%;" data-product="3">
+      <div class="hotspot-ring"></div>
+      <div class="hotspot-dot">
+        <span class="hotspot-num">4</span>
+      </div>
+      <div class="hotspot-label">Framed Wall Art</div>
+    </div>
+
+  </div><!-- end .room-wrapper -->
+</div><!-- end .room-section -->
+
+<!-- PRODUCT CARDS STRIP -->
+<div class="product-strip reveal">
+  <div class="strip-header">
+    <p class="section-eyebrow">Pieces in the room</p>
+    <h2 class="section-title">Every detail, crafted for your space.</h2>
+  </div>
+  <div class="products-grid" id="products-grid">
+    <!-- injected by JS -->
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-strip reveal">
+  <p class="hero-eyebrow">Get started</p>
+  <h2>Ready to bring it home?</h2>
+  <p>Every piece in the Impressify Room is available to order — or we'll create something entirely new for your space.</p>
+  <div class="cta-btns">
+    <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit"
+       target="_blank" class="btn-primary" style="font-size:17px;padding:14px 28px;">Request a Custom Quote</a>
+    <a href="ProductGallery.html" class="btn-ghost-inline">Browse Full Gallery</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">Impressify3D</p>
+      <p class="footer-tagline">Precision 3D printing and design services. Turning ideas into tangible realities, one layer at a time.</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Services</p>
+      <ul class="footer-links">
+        <li><a href="index.html#services">3D Modeling</a></li>
+        <li><a href="index.html#services">Prototyping</a></li>
+        <li><a href="index.html#services">Mass Production</a></li>
+        <li><a href="index.html#services">Custom Art</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Company</p>
+      <ul class="footer-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="ProductGallery.html">Gallery</a></li>
+        <li><a href="Wallpapers.html">Wallpapers</a></li>
+        <li><a href="room.html">The Room</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Contact</p>
+      <ul class="footer-links">
+        <li><a href="mailto:impressify3d@gmail.com">impressify3d@gmail.com</a></li>
+        <li><a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank">Request a Quote</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Copyright © 2025 Impressify3D. All rights reserved.</p>
+    <p>Built with precision. Delivered with care.</p>
+  </div>
+</footer>
+
+<!-- SIDE PANEL (white theme) -->
+<div class="panel-backdrop" id="panel-backdrop"></div>
+<div class="side-panel" id="side-panel">
+  <button class="panel-close" id="panel-close">✕</button>
+  <div class="panel-img-wrap">
+    <img src="" id="panel-img" alt="">
+  </div>
+  <div class="panel-body">
+    <p class="panel-tag"  id="panel-tag"></p>
+    <h3 class="panel-title" id="panel-title"></h3>
+    <p class="panel-desc"  id="panel-desc"></p>
+    <div class="panel-room-note" id="panel-room-note"></div>
+    <div class="panel-cta">
+      <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit"
+         target="_blank" class="btn-primary">Order This Piece</a>
+      <a href="ProductGallery.html" class="btn-ghost">See Full Gallery</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── ROOM PRODUCTS DATA ───────────────────────────────────────
+const ROOM_PRODUCTS = [
+  {
+    tag:       'Spiritual · Wall Piece',
+    title:     'Wall-Mounted Mandir',
+    desc:      'A sacred wall piece blending devotion with craftsmanship. Hand-detailed carvings, wall-mounted design — perfect for daily prayers without occupying floor space.',
+    roomNote:  '📍 In the Room: Mounted on the left wall, this mandir adds a spiritual centrepiece to the living space — exactly as it would in your home.',
+    imageId:   '1yD0Gfm_zYe1nFTgD9WetmmljOkqDy4SD',
+  },
+  {
+    tag:       'Spiritual · Miniature',
+    title:     'Eternal Harmony – Circular Temple',
+    desc:      'A precision miniature of a circular temple — a symbol of wholeness and spiritual unity. Small enough for a coffee table, detailed enough to start every conversation.',
+    roomNote:  '📍 In the Room: Placed at the heart of the coffee table — drawing the eye toward the centre of the space.',
+    imageId:   '1lTfanT9BYS1eEApfkr1L7Odho8-sDmwc',
+  },
+  {
+    tag:       'Decor · Figurine',
+    title:     'Sacred Blue Figurine',
+    desc:      'A bold cobalt-blue figurine with a smooth satin coat. A striking accent piece — the colour pops beautifully against natural wood and neutral tones.',
+    roomNote:  '📍 In the Room: On the wooden side table right of the sofa — its blue tone creates a deliberate colour accent in the warm-toned room.',
+    imageId:   '1b0uLBqI0047Ik8KEPd8W5OfPIqsfsJ6V',
+  },
+  {
+    tag:       'Decor · Wall Art',
+    title:     'Impressify3D Framed Print',
+    desc:      'A custom framed wall art piece — your brand, a favourite design, or a heritage motif rendered at print quality and mounted behind glass.',
+    roomNote:  '📍 In the Room: Hung on the back wall above the sofa — anchoring the room and making the brand visible at a glance.',
+    imageId:   '11WB2Lx_R2e-hJutKc4MS6XMjMmgG1qL4',
+  },
+];
+
+function driveThumb(id, size = 'w700') {
+  return `https://drive.google.com/thumbnail?id=${id}&sz=${size}`;
+}
+
+// ── BUILD PRODUCT CARDS ──────────────────────────────────────
+const grid = document.getElementById('products-grid');
+ROOM_PRODUCTS.forEach((p, i) => {
+  const card = document.createElement('div');
+  card.className = 'product-card';
+  card.dataset.product = i;
+  card.innerHTML = `
+    <div class="product-card-img">
+      <img src="${driveThumb(p.imageId)}" alt="${p.title}" loading="lazy">
+    </div>
+    <span class="product-card-badge">${i + 1}</span>
+    <div class="product-card-body">
+      <p class="product-card-tag">${p.tag}</p>
+      <h3 class="product-card-title">${p.title}</h3>
+      <p class="product-card-desc">${p.desc.substring(0, 72)}…</p>
+      <span class="product-card-link">View details</span>
+    </div>`;
+  card.addEventListener('click', () => openPanel(i));
+  grid.appendChild(card);
+});
+
+// ── PANEL LOGIC ──────────────────────────────────────────────
+const panel    = document.getElementById('side-panel');
+const backdrop = document.getElementById('panel-backdrop');
+
+function openPanel(idx) {
+  const p = ROOM_PRODUCTS[idx];
+
+  document.getElementById('panel-img').src          = driveThumb(p.imageId, 'w600');
+  document.getElementById('panel-tag').textContent   = p.tag;
+  document.getElementById('panel-title').textContent = p.title;
+  document.getElementById('panel-desc').textContent  = p.desc;
+  document.getElementById('panel-room-note').textContent = p.roomNote;
+
+  // Highlight matching hotspot and card
+  document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('active'));
+  document.querySelectorAll('.product-card').forEach(c => c.classList.remove('active-card'));
+  const hs = document.querySelector(`.hotspot[data-product="${idx}"]`);
+  if (hs) hs.classList.add('active');
+  const card = document.querySelector(`.product-card[data-product="${idx}"]`);
+  if (card) card.classList.add('active-card');
+
+  panel.classList.add('open');
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePanel() {
+  panel.classList.remove('open');
+  backdrop.classList.remove('open');
+  document.body.style.overflow = '';
+  document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('active'));
+  document.querySelectorAll('.product-card').forEach(c => c.classList.remove('active-card'));
+}
+
+document.getElementById('panel-close').addEventListener('click', closePanel);
+backdrop.addEventListener('click', closePanel);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+// Hotspots open panel too
+document.querySelectorAll('.hotspot').forEach(hs => {
+  hs.addEventListener('click', () => openPanel(parseInt(hs.dataset.product)));
+});
+
+// Stagger pulse animations
+document.querySelectorAll('.hotspot').forEach((hs, i) => {
+  hs.querySelector('.hotspot-ring').style.animationDelay = `${i * 0.5}s`;
+});
+
+// ── SCROLL REVEAL ────────────────────────────────────────────
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
