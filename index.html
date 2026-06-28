@@ -6,439 +6,651 @@
 <title>Impressify3D — Precision 3D Printing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --white: #ffffff;
-    --black: #1d1d1f;
-    --gray-mid: #6e6e73;
-    --gray-light: #f5f5f7;
-    --gray-border: #d2d2d7;
-    --blue: #0071e3;
-    --blue-hover: #0077ed;
-    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    --bg:       #FAFAF8;
+    --surface:  #FFFFFF;
+    --panel:    #F2F1ED;
+    --border:   #E5E4DF;
+    --ink:      #1A1A1C;
+    --ink-mid:  #6B6B70;
+    --ink-soft: #9A9A9F;
+    --orange:   #E8501A;
+    --orange-lt:#FFF0EB;
+    --display:  'Space Grotesk', sans-serif;
+    --body:     'Inter', sans-serif;
   }
 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-
   body {
-    font-family: var(--font);
-    color: var(--black);
-    background: var(--white);
+    font-family: var(--body);
+    background: var(--bg);
+    color: var(--ink);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
+  a { color: inherit; text-decoration: none; }
+  img, svg { display: block; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
 
   /* ── NAV ── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 22px;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 0.5px solid rgba(0,0,0,0.12);
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(20px, 5vw, 64px);
+    height: 58px;
+    background: rgba(250, 250, 248, 0.88);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border-bottom: 1px solid var(--border);
   }
+  .logo {
+    font-family: var(--display); font-weight: 700; font-size: 16px;
+    letter-spacing: 0.01em; display: flex; align-items: center; gap: 8px;
+    color: var(--ink);
+  }
+  .logo .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--orange); }
 
-  .nav-logo {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--black);
-    letter-spacing: -0.02em;
-    text-decoration: none;
-  }
-
-  .nav-links {
-    display: flex;
-    gap: 28px;
-    list-style: none;
-  }
-
-  .nav-links a {
-    font-size: 13px;
-    color: var(--black);
-    text-decoration: none;
-    opacity: 0.85;
-    transition: opacity 0.2s;
-  }
-  .nav-links a:hover { opacity: 1; }
+  nav ul { display: flex; gap: 0; list-style: none; }
+  nav a { font-size: 13.5px; color: var(--ink-mid); padding: 6px 14px; border-radius: 100px; transition: color .2s, background .2s; }
+  nav a:hover { color: var(--ink); background: var(--panel); }
+  nav a.active { color: var(--ink); font-weight: 600; }
+  .nav-links { display: flex; align-items: center; }
 
   .nav-cta {
-    font-size: 13px;
-    background: var(--blue);
-    color: white;
-    padding: 7px 16px;
-    border-radius: 980px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background 0.2s;
+    font-size: 13px; font-weight: 600;
+    background: var(--orange); color: #fff;
+    padding: 9px 20px; border-radius: 100px;
+    transition: background .2s, transform .2s;
   }
-  .nav-cta:hover { background: var(--blue-hover); }
+  .nav-cta:hover { background: #cc4315; transform: translateY(-1px); }
+
+  @media (max-width: 720px) { .nav-links { display: none; } }
 
   /* ── HERO ── */
   .hero {
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 100px 24px 80px;
-    background: var(--white);
-    position: relative;
+    gap: 0;
+    padding-top: 58px;
     overflow: hidden;
   }
-
-  .hero-eyebrow {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--blue);
-    margin-bottom: 18px;
+  .hero-left {
+    padding: clamp(48px, 8vw, 110px) clamp(24px, 5vw, 72px);
+    display: flex; flex-direction: column; justify-content: center;
   }
-
-  .hero-title {
-    font-size: clamp(42px, 7vw, 84px);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.0;
-    color: var(--black);
-    max-width: 900px;
-    margin-bottom: 24px;
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
   }
-
+  .eyebrow .line { width: 24px; height: 1.5px; background: var(--orange); }
+  h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(38px, 5.5vw, 76px);
+    line-height: 1.0; letter-spacing: -0.02em;
+    color: var(--ink); margin-bottom: 22px;
+  }
+  h1 .accent { color: var(--orange); }
   .hero-sub {
-    font-size: clamp(16px, 2.2vw, 22px);
-    font-weight: 400;
-    color: var(--gray-mid);
-    max-width: 640px;
-    line-height: 1.55;
-    margin-bottom: 44px;
+    font-size: clamp(15px, 1.4vw, 18px); color: var(--ink-mid);
+    line-height: 1.65; max-width: 440px; margin-bottom: 38px;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--body); font-weight: 600; font-size: 14px;
+    padding: 14px 26px; border-radius: 100px;
+    transition: transform .22s, background .22s, color .22s, border-color .22s;
+  }
+  .btn-primary { background: var(--orange); color: #fff; }
+  .btn-primary:hover { background: #cc4315; transform: translateY(-2px); }
+  .btn-outline {
+    border: 1.5px solid var(--border); color: var(--ink);
+    background: var(--surface);
+  }
+  .btn-outline:hover { border-color: var(--orange); color: var(--orange); transform: translateY(-2px); }
+
+  /* hero right — product mosaic */
+  .hero-right {
+    position: relative; height: 100vh; overflow: hidden;
+    background: var(--panel);
+  }
+  .hero-mosaic {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 55% 45%;
+    height: 100%;
+    gap: 3px;
+  }
+  .mosaic-main {
+    grid-column: 1; grid-row: 1 / 3;
+  }
+  .mosaic-top-right { grid-column: 2; grid-row: 1; }
+  .mosaic-bottom-right { grid-column: 2; grid-row: 2; }
+  .mosaic-img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .5s ease;
+  }
+  .mosaic-main:hover .mosaic-img,
+  .mosaic-top-right:hover .mosaic-img,
+  .mosaic-bottom-right:hover .mosaic-img { transform: scale(1.04); }
+  .mosaic-cell { overflow: hidden; position: relative; }
+  .mosaic-badge {
+    position: absolute; bottom: 14px; left: 14px; z-index: 2;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    background: rgba(250,250,248,0.9); color: var(--ink);
+    padding: 6px 12px; border-radius: 100px;
+    backdrop-filter: blur(8px);
   }
 
-  .hero-actions {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { height: 50vh; }
+    .hero-left { padding-bottom: 48px; }
   }
 
-  .btn-primary {
-    font-family: var(--font);
-    font-size: 17px;
-    font-weight: 500;
-    background: var(--blue);
-    color: white;
-    border: none;
-    padding: 14px 28px;
-    border-radius: 980px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: background 0.2s, transform 0.15s;
+  /* ── STATS ── */
+  .stats-strip {
+    background: var(--ink);
+    color: #fff;
+    padding: 48px clamp(24px, 6vw, 80px);
+    display: flex; justify-content: center;
   }
-  .btn-primary:hover { background: var(--blue-hover); transform: scale(1.01); }
-
-  .btn-ghost {
-    font-family: var(--font);
-    font-size: 17px;
-    font-weight: 500;
-    background: transparent;
-    color: var(--blue);
-    border: none;
-    padding: 14px 28px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: color 0.2s;
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    width: 100%; max-width: 900px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
   }
-  .btn-ghost::after { content: ' →'; }
-  .btn-ghost:hover { color: var(--blue-hover); }
+  @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+  .stat-cell {
+    background: var(--ink); padding: 32px 24px; text-align: center;
+  }
+  .stat-num {
+    font-family: var(--display); font-size: 44px; font-weight: 700;
+    letter-spacing: -0.03em; color: var(--orange);
+  }
+  .stat-label { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 5px; }
 
-  .layers-container {
-    margin-top: 70px;
-    position: relative;
-    width: 320px;
-    height: 200px;
-    perspective: 800px;
+  /* ── PRODUCT RAIL ── */
+  .rail-section {
+    padding: 96px 0 100px;
+    border-top: 1px solid var(--border);
+  }
+  .rail-head {
+    padding: 0 clamp(24px, 5vw, 72px);
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 40px; gap: 20px; flex-wrap: wrap;
+  }
+  .rail-head h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(22px, 2.8vw, 32px); letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .rail-head p { color: var(--ink-mid); font-size: 14px; max-width: 300px; }
+  .rail-head a {
+    font-size: 13.5px; font-weight: 600; color: var(--orange);
+    display: flex; align-items: center; gap: 5px; white-space: nowrap;
+    transition: gap .2s;
+  }
+  .rail-head a:hover { gap: 9px; }
+
+  .rail-track {
+    display: flex; gap: 16px; overflow-x: auto;
+    padding: 0 clamp(24px, 5vw, 72px) 16px;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .rail-track::-webkit-scrollbar { display: none; }
+
+  .rail-card {
+    flex: 0 0 auto; width: min(76vw, 300px); aspect-ratio: 4/5;
+    scroll-snap-align: start; border-radius: 16px; overflow: hidden;
+    position: relative; background: var(--panel);
+    border: 1px solid var(--border);
+    transition: transform .3s, box-shadow .3s;
+  }
+  .rail-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+
+  .rail-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .5s ease;
+  }
+  .rail-card:hover img { transform: scale(1.06); }
+
+  .rail-card .glow {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(180deg, transparent 50%, rgba(26,26,28,0.7) 100%);
+  }
+  .rail-card .tag {
+    position: absolute; left: 14px; bottom: 14px; z-index: 2;
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em;
+    background: rgba(250,250,248,0.88); color: var(--ink);
+    padding: 6px 12px; border-radius: 100px;
+    backdrop-filter: blur(6px);
   }
 
-  .layer {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 260px;
-    height: 28px;
-    border-radius: 6px;
-    opacity: 0;
-    animation: riseLayer 0.5s ease forwards;
+  /* ── SPLIT SECTIONS ── */
+  .split {
+    display: grid; grid-template-columns: 1.25fr 1fr; gap: 0;
+    border-top: 1px solid var(--border);
+    align-items: stretch;
   }
-  .layer:nth-child(1) { bottom: 0px; background: #0071e3; animation-delay: 0.1s; }
-  .layer:nth-child(2) { bottom: 30px; background: #1a8ce0; animation-delay: 0.25s; width: 230px; }
-  .layer:nth-child(3) { bottom: 60px; background: #34a2dd; animation-delay: 0.4s; width: 200px; }
-  .layer:nth-child(4) { bottom: 90px; background: #54b7d8; animation-delay: 0.55s; width: 170px; }
-  .layer:nth-child(5) { bottom: 120px; background: #78ccd3; animation-delay: 0.7s; width: 140px; }
-  .layer:nth-child(6) { bottom: 150px; background: #9edece; animation-delay: 0.85s; width: 110px; }
-  .layer:nth-child(7) { bottom: 180px; background: #c5f0c9; animation-delay: 1.0s; width: 80px; border-radius: 6px 6px 4px 4px; }
-  
-  .layer-label {
-    position: absolute;
-    bottom: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 12px;
-    color: var(--gray-mid);
-    white-space: nowrap;
-    opacity: 0;
-    animation: fadeIn 0.5s ease 1.2s forwards;
+  .split.reverse { grid-template-columns: 1fr 1.25fr; }
+  .split.reverse .split-visual { order: 2; }
+
+  .split-visual {
+    background: var(--panel); min-height: 440px;
+    position: relative; overflow: hidden;
+  }
+  .split-visual img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .6s ease;
+  }
+  .split-visual:hover img { transform: scale(1.04); }
+
+  .split-copy {
+    padding: clamp(40px, 6vw, 80px);
+    display: flex; flex-direction: column; justify-content: center;
+    background: var(--surface);
+  }
+  .split-copy .eyebrow { margin-bottom: 14px; }
+  .split-copy h3 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(24px, 3vw, 36px); line-height: 1.1;
+    letter-spacing: -0.01em; color: var(--ink); margin-bottom: 16px;
+  }
+  .split-copy p { color: var(--ink-mid); font-size: 15.5px; line-height: 1.65; max-width: 400px; margin-bottom: 24px; }
+  .split-copy .meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 4px; }
+  .meta-item { font-size: 13px; color: var(--ink-mid); }
+  .meta-item b { display: block; font-family: var(--display); font-size: 24px; color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 860px) {
+    .split, .split.reverse { grid-template-columns: 1fr; }
+    .split.reverse .split-visual { order: 0; }
+    .split-visual { min-height: 320px; }
   }
 
-  @keyframes riseLayer {
-    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-    to   { opacity: 1; transform: translateX(-50%) translateY(0px); }
+  /* ── SERVICES ── */
+  .services-section {
+    padding: 96px clamp(24px, 5vw, 72px);
+    background: var(--bg);
+    border-top: 1px solid var(--border);
   }
-  @keyframes fadeIn {
-    to { opacity: 1; }
+  .services-section .section-label {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(26px, 3.2vw, 38px); letter-spacing: -0.01em;
+    color: var(--ink); margin-bottom: 12px; margin-top: 8px;
   }
+  .services-section .section-sub {
+    color: var(--ink-mid); font-size: 15px; margin-bottom: 56px; max-width: 480px;
+  }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2px;
+    border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+    background: var(--border);
+  }
+  .service-card {
+    background: var(--surface); padding: 38px 32px;
+    transition: background .2s;
+  }
+  .service-card:hover { background: var(--orange-lt); }
+  .service-icon {
+    width: 46px; height: 46px; background: var(--panel); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 20px;
+  }
+  .service-title { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 10px; letter-spacing: -0.01em; }
+  .service-desc { font-size: 14px; color: var(--ink-mid); line-height: 1.6; }
 
-  section { padding: 100px 24px; }
-  .section-inner { max-width: 980px; margin: 0 auto; }
-  .section-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
-  .section-title { font-size: clamp(28px, 4vw, 48px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: var(--black); margin-bottom: 16px; }
-  .section-body { font-size: 19px; font-weight: 400; color: var(--gray-mid); line-height: 1.55; max-width: 640px; }
+  /* ── PHILOSOPHY ── */
+  .philosophy-section {
+    background: var(--ink); color: #fff;
+    padding: 96px clamp(24px, 5vw, 72px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .philosophy-section .eyebrow { color: var(--orange); }
+  .philosophy-section .section-label {
+    font-family: var(--display); font-size: clamp(26px, 3.2vw, 38px);
+    font-weight: 600; letter-spacing: -0.01em; color: #fff; margin-bottom: 12px; margin-top: 8px;
+  }
+  .philosophy-section .section-sub { color: rgba(255,255,255,0.45); font-size: 15px; margin-bottom: 56px; }
+  .pillars-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px; border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px; overflow: hidden;
+    background: rgba(255,255,255,0.07);
+  }
+  .pillar { background: #1A1A1C; padding: 40px 28px; transition: background .2s; }
+  .pillar:hover { background: #222224; }
+  .pillar-num { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: var(--orange); margin-bottom: 18px; }
+  .pillar-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 10px; line-height: 1.25; letter-spacing: -0.01em; }
+  .pillar-body { font-size: 13.5px; color: rgba(255,255,255,0.45); line-height: 1.6; }
 
-  .stat-strip { background: var(--gray-light); padding: 64px 24px; }
-  .stat-grid { max-width: 860px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--gray-border); border: 1px solid var(--gray-border); border-radius: 20px; overflow: hidden; }
-  .stat-cell { background: var(--gray-light); padding: 36px 28px; text-align: center; }
-  .stat-num { font-size: 48px; font-weight: 700; letter-spacing: -0.04em; color: var(--black); }
-  .stat-label { font-size: 14px; color: var(--gray-mid); margin-top: 4px; }
+  /* ── TOOLS ── */
+  .tools-section {
+    background: var(--panel); padding: 72px clamp(24px, 5vw, 72px);
+    border-top: 1px solid var(--border);
+    display: flex; flex-wrap: wrap; gap: 40px;
+    justify-content: space-between; align-items: center;
+  }
+  .tools-left h3 {
+    font-family: var(--display); font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 600; letter-spacing: -0.01em; color: var(--ink); margin-bottom: 8px;
+  }
+  .tools-left p { color: var(--ink-mid); font-size: 14px; }
+  .tools-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .tool-pill {
+    font-size: 13.5px; font-weight: 500; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 9px 20px; border-radius: 100px;
+    transition: border-color .2s, color .2s;
+  }
+  .tool-pill:hover { border-color: var(--orange); color: var(--orange); }
 
-  .services-section { background: var(--white); }
-  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2px; margin-top: 56px; border-radius: 20px; overflow: hidden; border: 1px solid var(--gray-border); background: var(--gray-border); }
-  .service-card { background: var(--white); padding: 40px 32px; transition: background 0.2s; }
-  .service-card:hover { background: #fafafa; }
-  .service-icon { width: 48px; height: 48px; background: var(--gray-light); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px; }
-  .service-title { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: var(--black); margin-bottom: 10px; }
-  .service-desc { font-size: 15px; color: var(--gray-mid); line-height: 1.55; }
+  /* ── ABOUT ── */
+  .about-section {
+    padding: 96px clamp(24px, 5vw, 72px);
+    background: var(--surface); border-top: 1px solid var(--border);
+  }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 64px; align-items: center; max-width: 1100px; margin: 0 auto;
+  }
+  @media (max-width: 760px) { .about-grid { grid-template-columns: 1fr; } }
+  .about-copy .section-label {
+    font-family: var(--display); font-size: clamp(26px, 3.2vw, 38px);
+    font-weight: 600; letter-spacing: -0.01em; color: var(--ink);
+    margin-bottom: 16px; margin-top: 8px;
+  }
+  .about-copy p { font-size: 15.5px; color: var(--ink-mid); line-height: 1.65; margin-bottom: 28px; }
+  .values-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .values-list li {
+    font-size: 15px; color: var(--ink);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .values-list li::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--orange); flex-shrink: 0;
+  }
+  .about-image { border-radius: 20px; overflow: hidden; }
+  .about-image img { width: 100%; height: auto; display: block; object-fit: cover; }
 
-  .philosophy-section { background: var(--black); color: white; }
-  .philosophy-section .section-title { color: white; }
-  .philosophy-section .section-eyebrow { color: #86b9ff; }
-  .philosophy-section .section-body { color: rgba(255,255,255,0.6); }
-  .pillars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; margin-top: 56px; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; overflow: hidden; background: rgba(255,255,255,0.08); }
-  .pillar { background: #1d1d1f; padding: 40px 28px; }
-  .pillar-num { font-size: 13px; font-weight: 600; color: #86b9ff; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .pillar-title { font-size: 19px; font-weight: 600; color: white; margin-bottom: 10px; line-height: 1.25; letter-spacing: -0.01em; }
-  .pillar-body { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.55; }
+  /* ── CTA ── */
+  .cta-section {
+    background: var(--orange);
+    padding: 100px clamp(24px, 5vw, 72px);
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(255,255,255,0.1) 0%, transparent 70%);
+  }
+  .cta-section h2 {
+    font-family: var(--display); font-size: clamp(32px, 5vw, 58px);
+    font-weight: 700; letter-spacing: -0.02em; color: #fff;
+    margin-bottom: 16px; position: relative;
+  }
+  .cta-section p { font-size: 17px; color: rgba(255,255,255,0.75); margin-bottom: 42px; position: relative; }
+  .cta-section .hero-actions { justify-content: center; position: relative; }
+  .btn-white { background: #fff; color: var(--orange); }
+  .btn-white:hover { background: #f5f0ee; transform: translateY(-2px); }
+  .btn-transp { border: 1.5px solid rgba(255,255,255,0.4); color: #fff; }
+  .btn-transp:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
 
-  .tools-section { background: var(--gray-light); }
-  .tools-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
-  .tool-pill { font-size: 14px; font-weight: 500; color: var(--black); background: white; border: 1px solid var(--gray-border); padding: 8px 18px; border-radius: 980px; }
-
-  .about-section { background: var(--white); }
-  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-top: 0; }
-  @media (max-width: 680px) { .about-grid { grid-template-columns: 1fr; } }
-  
-  .about-image-container { overflow: hidden; border-radius: 24px; }
-  .about-img { width: 100%; height: auto; display: block; object-fit: cover; }
-  .values-list { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
-  .values-list li { font-size: 16px; color: var(--black); display: flex; align-items: center; gap: 10px; }
-  .values-list li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
-
-  .cta-section { background: var(--gray-light); text-align: center; padding: 120px 24px; }
-  .cta-section .section-title { margin: 0 auto 16px; max-width: 700px; }
-  .cta-section .section-body { margin: 0 auto 44px; }
-
-  footer { background: var(--gray-light); border-top: 0.5px solid var(--gray-border); padding: 40px 24px; }
-  .footer-inner { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
-  @media (max-width: 680px) { .footer-inner { grid-template-columns: 1fr 1fr; } }
-  .footer-brand { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--black); margin-bottom: 10px; }
-  .footer-tagline { font-size: 13px; color: var(--gray-mid); line-height: 1.55; max-width: 220px; }
-  .footer-col-title { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--black); margin-bottom: 14px; }
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); color: rgba(255,255,255,0.55);
+    padding: 64px clamp(24px, 5vw, 72px) 32px;
+  }
+  .footer-inner {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px; margin-bottom: 48px;
+  }
+  @media (max-width: 760px) { .footer-inner { grid-template-columns: 1fr 1fr; } }
+  .footer-logo {
+    font-family: var(--display); font-size: 15px; font-weight: 700;
+    color: #fff; display: flex; align-items: center; gap: 7px; margin-bottom: 12px;
+  }
+  .footer-logo .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+  .footer-tagline { font-size: 13px; line-height: 1.6; max-width: 220px; }
+  .footer-col-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
   .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .footer-links a { font-size: 13px; color: var(--gray-mid); text-decoration: none; transition: color 0.2s; }
-  .footer-links a:hover { color: var(--black); }
-  .footer-bottom { max-width: 980px; margin: 32px auto 0; padding-top: 20px; border-top: 0.5px solid var(--gray-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-  .footer-bottom p { font-size: 12px; color: var(--gray-mid); }
+  .footer-links a { font-size: 13px; color: rgba(255,255,255,0.45); transition: color .2s; }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom {
+    padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+  }
+  .footer-bottom p { font-size: 12px; color: rgba(255,255,255,0.25); }
 
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-  
-  @media (max-width: 600px) { .nav-links { display: none; } }
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .65s ease, transform .65s ease; }
+  .reveal.in { opacity: 1; transform: none; }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">Impressify3D</a>
-  <ul class="nav-links">
-    <!-- Managed automatically via data.js -->
-  </ul>
+<header>
+  <a href="#" class="logo"><span class="dot"></span>IMPRESSIFY3D</a>
+  <nav>
+    <ul class="nav-links">
+      <!-- populated by data.js -->
+    </ul>
+  </nav>
   <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="nav-cta">Request a Quote</a>
-</nav>
+</header>
 
-<!-- HERO -->
+<!-- HERO — product-first, two-column -->
 <section class="hero" id="home">
-  <p class="hero-eyebrow">3D Printing &amp; Design Studio</p>
-  <h1 class="hero-title">Transforming Ideas Into Reality</h1>
-  <p class="hero-sub">From concept to creation — precision 3D modeling, prototyping, and printing for artists, architects, engineers, and innovators.</p>
-  <div class="hero-actions">
-    <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="btn-primary">Request a Quote</a>
-    <a href="#services" class="btn-ghost">Our Services</a>
+  <div class="hero-left">
+    <div class="eyebrow"><span class="line"></span>3D Printing &amp; Design Studio</div>
+    <h1>Ideas made<br><span class="accent">real,</span><br>one layer<br>at a time.</h1>
+    <p class="hero-sub">From concept sketch to finished piece — precision 3D modeling, prototyping, and custom printing for artists, architects, and innovators.</p>
+    <div class="hero-actions">
+      <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="btn btn-primary">Request a Quote →</a>
+      <a href="#gallery" class="btn btn-outline">See Our Work</a>
+    </div>
   </div>
 
-  <div class="layers-container" aria-hidden="true">
-    <div class="layer"></div>
-    <div class="layer"></div>
-    <div class="layer"></div>
-    <div class="layer"></div>
-    <div class="layer"></div>
-    <div class="layer"></div>
-    <div class="layer"></div>
-    <p class="layer-label">One layer at a time.</p>
+  <!-- Hero mosaic: 3 product images from data.js -->
+  <div class="hero-right" id="heroMosaic">
+    <div class="hero-mosaic">
+      <!-- JS fills these -->
+    </div>
   </div>
 </section>
 
 <!-- STATS -->
-<div class="stat-strip">
-  <div class="stat-grid reveal">
-    <div class="stat-cell">
+<div class="stats-strip">
+  <div class="stats-grid">
+    <div class="stat-cell reveal">
       <div class="stat-num">500+</div>
       <div class="stat-label">Projects delivered</div>
     </div>
-    <div class="stat-cell">
+    <div class="stat-cell reveal">
       <div class="stat-num">4</div>
       <div class="stat-label">Pro-grade tools</div>
     </div>
-    <div class="stat-cell">
+    <div class="stat-cell reveal">
       <div class="stat-num">48h</div>
       <div class="stat-label">Rapid prototype turnaround</div>
     </div>
-    <div class="stat-cell">
+    <div class="stat-cell reveal">
       <div class="stat-num">100%</div>
       <div class="stat-label">Custom every time</div>
     </div>
   </div>
 </div>
 
+<!-- PRODUCT RAIL -->
+<section class="rail-section" id="gallery">
+  <div class="rail-head">
+    <div>
+      <div class="eyebrow"><span class="line"></span>Our Work</div>
+      <h2>Crafted with precision.</h2>
+    </div>
+    <div style="text-align:right">
+      <p>Spiritual, heritage, and decor pieces — all printed in-house.</p>
+      <a href="ProductGallery.html" style="margin-top:10px; display:inline-flex;">View full gallery →</a>
+    </div>
+  </div>
+  <div class="rail-track" id="railTrack">
+    <!-- populated by JS -->
+  </div>
+</section>
+
+<!-- SPLIT 1: Featured product + copy -->
+<section class="split" id="process">
+  <div class="split-visual reveal" id="splitFeaturedImg" style="background:var(--panel);">
+    <!-- populated by JS -->
+  </div>
+  <div class="split-copy reveal">
+    <div class="eyebrow"><span class="line"></span>Design to Reality</div>
+    <h3>Concept sketch to print-ready model, in days.</h3>
+    <p>Our design team converts rough sketches, references, or partial CAD into production-ready 3D data — built to print right the first time.</p>
+    <div class="meta">
+      <div class="meta-item"><b>0.05mm</b>Layer precision</div>
+      <div class="meta-item"><b>24–72h</b>Turnaround</div>
+      <div class="meta-item"><b>30+</b>Materials</div>
+    </div>
+  </div>
+</section>
+
+<!-- SPLIT 2: reversed -->
+<section class="split reverse">
+  <div class="split-copy reveal">
+    <div class="eyebrow"><span class="line"></span>Rapid Prototyping</div>
+    <h3>Hold the part before you commit.</h3>
+    <p>Quick-turn prints at industry-grade accuracy mean you're testing fit, function, and feel — not guessing from a render.</p>
+    <a class="btn btn-outline" href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" style="align-self:flex-start;">Request a prototype →</a>
+  </div>
+  <div class="split-visual reveal" id="splitSecondImg" style="background:var(--panel);">
+    <!-- populated by JS -->
+  </div>
+</section>
+
 <!-- SERVICES -->
 <section class="services-section" id="services">
-  <div class="section-inner">
-    <p class="section-eyebrow reveal">What we do</p>
-    <h2 class="section-title reveal">End-to-end printing services,<br>tailored to your vision.</h2>
-    <p class="section-body reveal">We handle every stage — from your initial sketch to a finished, production-ready piece.</p>
-
-    <div class="services-grid">
-      <div class="service-card reveal">
-        <div class="service-icon">✏️</div>
-        <h3 class="service-title">3D Design &amp; Modeling</h3>
-        <p class="service-desc">From concept sketches to CAD-ready digital models, our designers convert your vision into precision 3D data ready for production.</p>
-      </div>
-      <div class="service-card reveal">
-        <div class="service-icon">⚡</div>
-        <h3 class="service-title">Prototyping &amp; Rapid Printing</h3>
-        <p class="service-desc">Need your prototype fast? We deliver quick-turn prints with industry-grade accuracy, ready for testing and validation.</p>
-      </div>
-      <div class="service-card reveal">
-        <div class="service-icon">🏭</div>
-        <h3 class="service-title">Mass Production &amp; Finishing</h3>
-        <p class="service-desc">High-quality prints at scale — across multiple materials, textures, and post-processing finishes for professional-grade outcomes.</p>
-      </div>
-      <div class="service-card reveal">
-        <div class="service-icon">🎨</div>
-        <h3 class="service-title">Custom Art &amp; Miniatures</h3>
-        <p class="service-desc">Personal sculptures, architectural models, or collectibles — printed with unmatched detail and creative precision.</p>
-      </div>
+  <div class="eyebrow reveal"><span class="line"></span>What We Do</div>
+  <h2 class="section-label reveal">End-to-end printing<br>tailored to your vision.</h2>
+  <p class="section-sub reveal">We handle every stage — from your initial sketch to a finished, production-ready piece.</p>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-icon">✏️</div>
+      <h3 class="service-title">3D Design &amp; Modeling</h3>
+      <p class="service-desc">Concept sketches to CAD-ready models — our designers convert your vision into precision 3D data ready for production.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">⚡</div>
+      <h3 class="service-title">Prototyping &amp; Rapid Printing</h3>
+      <p class="service-desc">Quick-turn prints with industry-grade accuracy, ready for testing and validation fast.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">🏭</div>
+      <h3 class="service-title">Mass Production &amp; Finishing</h3>
+      <p class="service-desc">High-quality prints at scale — across multiple materials, textures, and post-processing finishes.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">🎨</div>
+      <h3 class="service-title">Custom Art &amp; Miniatures</h3>
+      <p class="service-desc">Personal sculptures, architectural models, or collectibles — printed with unmatched detail and creative precision.</p>
     </div>
   </div>
 </section>
 
 <!-- PHILOSOPHY -->
-<section class="philosophy-section">
-  <div class="section-inner">
-    <p class="section-eyebrow reveal">Our thinking</p>
-    <h2 class="section-title reveal">Built on four core ideas.</h2>
-    <p class="section-body reveal">Everything we make comes back to these principles.</p>
-
-    <div class="pillars-grid">
-      <div class="pillar reveal">
-        <p class="pillar-num">01</p>
-        <h3 class="pillar-title">Creativity at Its Core</h3>
-        <p class="pillar-body">Precision and artistry together — turning even the most imaginative visions into tangible, meaningful products.</p>
-      </div>
-      <div class="pillar reveal">
-        <p class="pillar-num">02</p>
-        <h3 class="pillar-title">Personalized to You</h3>
-        <p class="pillar-body">Every print reflects individual creativity. We use precision 3D design to create tailored products that are uniquely yours.</p>
-      </div>
-      <div class="pillar reveal">
-        <p class="pillar-num">03</p>
-        <h3 class="pillar-title">Sustainable Materials</h3>
-        <p class="pillar-body">Choosing the right filament means strength, detail, and minimal environmental impact — innovation without compromise.</p>
-      </div>
-      <div class="pillar reveal">
-        <p class="pillar-num">04</p>
-        <h3 class="pillar-title">Future-Ready</h3>
-        <p class="pillar-body">AI-powered printers, automated quality control, and on-time delivery — pushing the boundaries of design and material science.</p>
-      </div>
+<section class="philosophy-section" id="about">
+  <div class="eyebrow reveal"><span class="line"></span>Our Thinking</div>
+  <h2 class="section-label reveal">Built on four core ideas.</h2>
+  <p class="section-sub reveal">Everything we make comes back to these principles.</p>
+  <div class="pillars-grid">
+    <div class="pillar reveal">
+      <p class="pillar-num">01</p>
+      <h3 class="pillar-title">Creativity at Its Core</h3>
+      <p class="pillar-body">Precision and artistry together — turning even the most imaginative visions into tangible, meaningful products.</p>
+    </div>
+    <div class="pillar reveal">
+      <p class="pillar-num">02</p>
+      <h3 class="pillar-title">Personalized to You</h3>
+      <p class="pillar-body">Every print reflects individual creativity. We use precision 3D design to create tailored products that are uniquely yours.</p>
+    </div>
+    <div class="pillar reveal">
+      <p class="pillar-num">03</p>
+      <h3 class="pillar-title">Sustainable Materials</h3>
+      <p class="pillar-body">Choosing the right filament means strength, detail, and minimal environmental impact — innovation without compromise.</p>
+    </div>
+    <div class="pillar reveal">
+      <p class="pillar-num">04</p>
+      <h3 class="pillar-title">Future-Ready</h3>
+      <p class="pillar-body">AI-powered printers, automated quality control, and on-time delivery — pushing the boundaries of design and material science.</p>
     </div>
   </div>
 </section>
 
 <!-- TOOLS -->
 <section class="tools-section">
-  <div class="section-inner">
-    <p class="section-eyebrow reveal">Technology</p>
-    <h2 class="section-title reveal">Powered by<br>industry-leading tools.</h2>
-    <p class="section-body reveal">We work with the same software trusted by professionals across engineering, architecture, and industrial design.</p>
-    <div class="tools-pills reveal">
-      <span class="tool-pill">Blender</span>
-      <span class="tool-pill">Fusion 360</span>
-      <span class="tool-pill">SolidWorks</span>
-      <span class="tool-pill">Bambu Lab</span>
-    </div>
+  <div class="tools-left reveal">
+    <h3>Powered by industry-leading tools.</h3>
+    <p>The same software trusted by engineers, architects, and industrial designers worldwide.</p>
+  </div>
+  <div class="tools-pills reveal">
+    <span class="tool-pill">Blender</span>
+    <span class="tool-pill">Fusion 360</span>
+    <span class="tool-pill">SolidWorks</span>
+    <span class="tool-pill">Bambu Lab</span>
   </div>
 </section>
 
 <!-- ABOUT -->
-<section class="about-section" id="about">
-  <div class="section-inner">
-    <div class="about-grid">
-      <div>
-        <p class="section-eyebrow reveal">About Impressify3D</p>
-        <h2 class="section-title reveal">Engineering meets artistry.</h2>
-        <p class="section-body reveal">Founded by creators passionate about design, technology, and innovation — we empower businesses, students, and makers to bring their concepts into the physical world through affordable, high-quality 3D printing.</p>
-        <ul class="values-list reveal">
-          <li>Creativity through technology</li>
-          <li>Precision with purpose</li>
-          <li>Partnership-driven innovation</li>
-        </ul>
-      </div>
-      
-      <div class="about-image-container reveal">
-        <img src="https://lh3.googleusercontent.com/d/1zLR8K2_JLB-wVHECFPrHq6yvh16-mYnJ" alt="Impressify3D Visual Showcase" class="about-img" />
-      </div> 
+<section class="about-section">
+  <div class="about-grid">
+    <div class="about-copy">
+      <div class="eyebrow reveal"><span class="line"></span>About Impressify3D</div>
+      <h2 class="section-label reveal">Engineering meets artistry.</h2>
+      <p class="reveal">Founded by creators passionate about design, technology, and innovation — we empower businesses, students, and makers to bring their concepts into the physical world through affordable, high-quality 3D printing.</p>
+      <ul class="values-list reveal">
+        <li>Creativity through technology</li>
+        <li>Precision with purpose</li>
+        <li>Partnership-driven innovation</li>
+      </ul>
+    </div>
+    <div class="about-image reveal">
+      <img src="https://lh3.googleusercontent.com/d/1zLR8K2_JLB-wVHECFPrHq6yvh16-mYnJ" alt="Impressify3D Studio" />
     </div>
   </div>
 </section>
 
 <!-- CTA -->
 <section class="cta-section">
-  <div class="section-eyebrow reveal">Get started</div>
-  <h2 class="section-title reveal">Shape tomorrow with us.</h2>
-  <p class="section-body reveal">Join the growing community of creators, architects, and engineers who bring their ideas to life with Impressify3D.</p>
-  <div class="hero-actions">
-    <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="btn-primary">Request a Quote</a>
-    <a href="mailto:impressify3d@gmail.com" class="btn-ghost">Email Us</a>
+  <h2 class="reveal">Bring your idea<br>to the build plate.</h2>
+  <p class="reveal">Send a sketch, a file, or just an idea — we'll tell you what it takes to print it.</p>
+  <div class="hero-actions reveal">
+    <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="btn btn-white">Start a project →</a>
+    <a href="mailto:impressify3d@gmail.com" class="btn btn-transp">Email us</a>
   </div>
 </section>
 
@@ -446,8 +658,8 @@
 <footer>
   <div class="footer-inner">
     <div>
-      <p class="footer-brand">Impressify3D</p>
-      <p class="footer-tagline">Precision 3D printing and design services. Turning ideas into tangible realities, one layer at a time.</p>
+      <div class="footer-logo"><span class="dot"></span>IMPRESSIFY3D</div>
+      <p class="footer-tagline">Precision 3D printing and design. Turning ideas into tangible realities, one layer at a time.</p>
     </div>
     <div>
       <p class="footer-col-title">Services</p>
@@ -475,23 +687,104 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <p>Copyright © 2025 Impressify3D. All rights reserved.</p>
+    <p>© 2026 Impressify3D. All rights reserved.</p>
     <p>Built with precision. Delivered with care.</p>
   </div>
 </footer>
 
-<script src="data.js"></script>
 <script>
-  const revealEls = document.querySelectorAll('.reveal');
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        obs.unobserve(e.target);
-      }
-    });
+// ── INLINE DATA (mirrors data.js, no separate file needed for index) ──────────
+const FALLBACK_ITEMS = [
+  { id:'mandir-01',       title:'Wall-Mounted Mandir',         tag_label:'Spiritual · Featured', image_drive_id:'1yD0Gfm_zYe1nFTgD9WetmmljOkqDy4SD', gallery_desc:'Intricate carvings with a sacred aura — wall-mounted for convenience without sacrificing beauty or devotion.', featured:true  },
+  { id:'jharokha-01',     title:'Jharokha – The Royal Balcony', tag_label:'Heritage',             image_drive_id:'1NaY_dSSJKdX_iXInt6TPlI4jpTdb-K3e', gallery_desc:'Intricate Rajasthani and Mughal carvings — ornate jali work and geometric patterns.', featured:false },
+  { id:'circular-temple', title:'Eternal Harmony Temple',      tag_label:'Spiritual',             image_drive_id:'1lTfanT9BYS1eEApfkr1L7Odho8-sDmwc', gallery_desc:'Gracefully curved structure radiating a serene atmosphere and spiritual unity.', featured:false },
+  { id:'heritage-home',   title:'Maharashtrian Heritage Home', tag_label:'Architecture · Heritage',image_drive_id:'1KiVVEh7SwR1MV9mahCYX6ditEnlHPcTR', gallery_desc:'Intricate woodwork and spacious courtyards honouring Maharashtra\'s rich heritage.', featured:false },
+  { id:'jharokha-temple', title:'Majestic Temple Jharokha',   tag_label:'Spiritual · Heritage',  image_drive_id:'1b0uLBqI0047Ik8KEPd8W5OfPIqsfsJ6V', gallery_desc:'Intricate lattice work and ornate arches that elevate this temple\'s grandeur.', featured:false },
+  { id:'round-temple',    title:'Divine Circle Temple',        tag_label:'Spiritual',             image_drive_id:'1TCGafas8hgwym5yam_k-hZbOgbPGDIM_', gallery_desc:'Harmonious round form symbolising wholeness and divine grace.', featured:false },
+  { id:'text-decor',      title:'3D Text Decor',               tag_label:'Decor · Custom',        image_drive_id:'11WB2Lx_R2e-hJutKc4MS6XMjMmgG1qL4', gallery_desc:'Bold lettering transformed into a stylish desk piece — name, word, or quote.', featured:true  },
+];
+
+function driveUrl(id, size='w1200') {
+  if (!id || id.startsWith('REPLACE')) return 'https://via.placeholder.com/800x1000/f2f1ed/e8501a?text=Image+pending';
+  return `https://drive.google.com/thumbnail?id=${id}&sz=${size}`;
+}
+
+// ── HERO MOSAIC ───────────────────────────────────────────────────────────────
+function buildHeroMosaic(items) {
+  const mosaic = document.querySelector('.hero-mosaic');
+  if (!mosaic) return;
+  // Pick 3 items: featured first, then fill
+  const featured = items.find(i => i.featured) || items[0];
+  const others = items.filter(i => i !== featured).slice(0, 2);
+
+  const cells = [
+    { item: featured, cls: 'mosaic-cell mosaic-main' },
+    { item: others[0] || items[1], cls: 'mosaic-cell mosaic-top-right' },
+    { item: others[1] || items[2], cls: 'mosaic-cell mosaic-bottom-right' },
+  ];
+
+  mosaic.innerHTML = cells.map(({ item, cls }) => `
+    <div class="${cls}">
+      <img class="mosaic-img" src="${driveUrl(item.image_drive_id, 'w800')}" alt="${item.title}" loading="eager" />
+      <span class="mosaic-badge">${item.tag_label}</span>
+    </div>
+  `).join('');
+}
+
+// ── PRODUCT RAIL ──────────────────────────────────────────────────────────────
+function buildRail(items) {
+  const track = document.getElementById('railTrack');
+  if (!track) return;
+  track.innerHTML = items.map(item => `
+    <div class="rail-card">
+      <img src="${driveUrl(item.image_drive_id, 'w600')}" alt="${item.title}" loading="lazy" />
+      <div class="glow"></div>
+      <div class="tag">${item.tag_label}</div>
+    </div>
+  `).join('');
+}
+
+// ── SPLIT IMAGES ──────────────────────────────────────────────────────────────
+function buildSplitImages(items) {
+  const feat = document.getElementById('splitFeaturedImg');
+  const sec  = document.getElementById('splitSecondImg');
+  const first  = items.find(i => i.featured) || items[0];
+  const second = items.filter(i => i !== first)[0] || items[1];
+  if (feat && first) feat.innerHTML = `<img src="${driveUrl(first.image_drive_id, 'w1200')}" alt="${first.title}" style="width:100%;height:100%;object-fit:cover;" loading="lazy"/>`;
+  if (sec  && second) sec.innerHTML = `<img src="${driveUrl(second.image_drive_id, 'w1200')}" alt="${second.title}" style="width:100%;height:100%;object-fit:cover;" loading="lazy"/>`;
+}
+
+// ── NAV INJECTION (mirrors data.js behaviour) ─────────────────────────────────
+function initNav() {
+  const ul = document.querySelector('.nav-links');
+  if (!ul) return;
+  ul.innerHTML = `
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="ProductGallery.html">Gallery</a></li>
+    <li><a href="Wallpapers.html">Wallpapers</a></li>
+    <li><a href="mailto:impressify3d@gmail.com">Contact</a></li>
+  `;
+}
+
+// ── REVEAL ON SCROLL ──────────────────────────────────────────────────────────
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
   }, { threshold: 0.12 });
-  revealEls.forEach(el => obs.observe(el));
+  els.forEach(el => obs.observe(el));
+}
+
+// ── BOOT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initNav();
+  buildHeroMosaic(FALLBACK_ITEMS);
+  buildRail(FALLBACK_ITEMS);
+  buildSplitImages(FALLBACK_ITEMS);
+  initReveal();
+});
 </script>
+
 </body>
 </html>
