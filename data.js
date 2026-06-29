@@ -11,7 +11,7 @@
 
 // ── SITE CONFIG ──────────────────────────────────────────────
 const SITE_CONFIG = {
-  whatsapp_number: '91XXXXXXXXXX',          // ← e.g. '919876543210' (no + or spaces)
+  whatsapp_number: '+16022148109',          // ← e.g. '919876543210' (no + or spaces)
   quote_form_url:  'https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit',
   email:           'impressify3d@gmail.com',
   instagram:       '',                       // ← e.g. 'https://instagram.com/impressify3d'
