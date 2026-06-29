@@ -99,6 +99,15 @@
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
   }
+  .new-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+    background: #1d8348; color: white;
+    padding: 4px 9px; border-radius: 980px;
+  }
+  .image-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .price-badge { font-size: 11px; font-weight: 600; color: #e8501a; background: #fff8f0; border: 1px solid #fddcc8; padding: 3px 8px; border-radius: 980px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
 
   .gallery-body { padding: 20px 20px 24px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
   .image-title { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--black); line-height: 1.25; }
@@ -255,16 +264,21 @@
     const fullResUrl  = item.wallpaper_url || driveUrl(item.image_drive_id, 'w3840');
     const tags        = (item.wallpaper_tags || '').split(',').map(t => t.trim()).filter(Boolean);
     const res         = item.wallpaper_res || '4K · 3840×2160';
+    const showNew     = isNewItem(item);
 
     const el = document.createElement('div');
     el.className = 'gallery-item';
     el.innerHTML = `
-      <div class="gallery-img-wrapper" onclick="openLightbox(${idx})">
+      <div class="gallery-img-wrapper" onclick="openLightbox(${idx})" style="cursor:zoom-in">
         <img src="${previewUrl}" alt="${item.title}" loading="lazy">
         <span class="res-badge">${res}</span>
+        ${showNew ? '<span class="new-badge">New</span>' : ''}
       </div>
       <div class="gallery-body">
-        <div class="image-title">${item.title}</div>
+        <div class="image-title-row">
+          <div class="image-title">${item.title}</div>
+          ${item.price_tier ? `<span class="price-badge">${item.price_tier}</span>` : ''}
+        </div>
         <div class="image-desc">${item.wallpaper_desc}</div>
         ${tags.length ? `<div class="tag-row">${tags.map(t => `<span class="style-tag">${t}</span>`).join('')}</div>` : ''}
         <div class="actions-row">
