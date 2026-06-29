@@ -51,15 +51,31 @@
   .gallery {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2px;
-    background: var(--gray-border);
+    gap: 0;
     border: 1px solid var(--gray-border);
     border-radius: 20px;
     overflow: hidden;
+    background: var(--white);
   }
   @media (max-width: 660px) { .gallery { grid-template-columns: 1fr; } }
 
-  .gallery-item { background: var(--white); display: flex; flex-direction: column; transition: background 0.2s; }
+  .gallery-item {
+    background: var(--white);
+    display: flex; flex-direction: column;
+    transition: background 0.2s;
+    border-right: 1px solid var(--gray-border);
+    border-bottom: 1px solid var(--gray-border);
+  }
+  /* Remove right border on items that land in the last column */
+  .gallery-item:nth-child(3n) { border-right: none; }
+  @media (max-width: 660px) {
+    .gallery-item { border-right: none; }
+  }
+  /* Remove bottom border from the last row of items */
+  .gallery-item:last-child,
+  .gallery-item:nth-last-child(2):nth-child(3n+1),
+  .gallery-item:nth-last-child(3):nth-child(3n+1) { border-bottom: none; }
+  .gallery-item:nth-last-child(-n+3):nth-child(3n+1) ~ .gallery-item { border-bottom: none; }
   .gallery-item:hover { background: #fafafa; }
 
   .gallery-img-wrapper {
@@ -279,6 +295,19 @@
   closeBtn.addEventListener('click', closeLightbox);
   modal.addEventListener('click', e => { if (e.target === modal) closeLightbox(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeLightbox(); });
+
+  // Remove bottom border from the last visible row so no ghost line shows
+  function fixLastRowBorders() {
+    const items = [...gallery.querySelectorAll('.gallery-item')];
+    if (!items.length) return;
+    const lastTop = items[items.length - 1].getBoundingClientRect().top;
+    items.forEach(item => {
+      const isLastRow = Math.abs(item.getBoundingClientRect().top - lastTop) < 2;
+      item.style.borderBottom = isLastRow ? 'none' : '';
+    });
+  }
+  fixLastRowBorders();
+  window.addEventListener('resize', fixLastRowBorders);
 
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
