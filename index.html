@@ -368,6 +368,84 @@
   }
   .tool-pill:hover { border-color: var(--orange); color: var(--orange); }
 
+  /* ── TESTIMONIALS ── */
+  .testi-section {
+    padding: 96px clamp(24px, 5vw, 72px) 100px;
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+  .testi-section .eyebrow { color: var(--orange); }
+  .testi-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    flex-wrap: wrap; gap: 20px; margin-bottom: 48px;
+  }
+  .testi-header-left .section-label {
+    font-family: var(--display); font-size: clamp(26px, 3.2vw, 38px);
+    font-weight: 600; letter-spacing: -0.01em; color: #fff;
+    margin-bottom: 0; margin-top: 8px;
+  }
+  .testi-avg { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .testi-avg .stars { color: var(--orange); font-size: 18px; letter-spacing: 2px; }
+  .testi-avg-right { display: flex; flex-direction: column; gap: 2px; }
+  .testi-avg .avg-score { font-family: var(--display); font-size: 30px; font-weight: 700; color: #fff; letter-spacing: -0.02em; line-height: 1; }
+  .testi-avg .avg-label { font-size: 12px; color: rgba(255,255,255,.35); }
+
+  .testi-track {
+    display: flex; gap: 16px;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    -ms-overflow-style: none; scrollbar-width: none;
+    cursor: grab;
+  }
+  .testi-track::-webkit-scrollbar { display: none; }
+  .testi-track.grabbing { cursor: grabbing; }
+
+  .testi-card {
+    flex: 0 0 clamp(280px, 36vw, 360px); scroll-snap-align: start;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px; padding: 28px 28px 32px;
+    display: flex; flex-direction: column; gap: 16px;
+    transition: background .25s, border-color .25s;
+  }
+  .testi-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.14); }
+  .testi-card.featured-card { background: var(--orange-lt); border-color: rgba(232,80,26,.3); }
+  .testi-card.featured-card .testi-quote { color: var(--ink); }
+  .testi-card.featured-card .testi-name { color: var(--ink); }
+  .testi-card.featured-card .testi-meta { color: var(--ink-mid); }
+  .testi-card.featured-card .testi-product { color: var(--orange); }
+  .testi-card.featured-card .testi-verified { color: var(--ink-mid); }
+  .testi-card.featured-card .testi-verified::before { background: rgba(0,0,0,.08); }
+
+  .testi-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .testi-stars { color: var(--orange); font-size: 13px; letter-spacing: 2px; }
+  .testi-verified { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: rgba(255,255,255,.4); display: flex; align-items: center; gap: 5px; }
+  .testi-verified::before { content: '✓'; width: 15px; height: 15px; border-radius: 50%; background: rgba(255,255,255,.12); display: inline-flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+
+  .testi-quote { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,.72); font-style: italic; flex: 1; }
+  .testi-quote::before { content: '\201C'; }
+  .testi-quote::after  { content: '\201D'; }
+
+  .testi-footer { display: flex; flex-direction: column; gap: 3px; }
+  .testi-name { font-size: 14px; font-weight: 600; color: #fff; letter-spacing: -0.01em; }
+  .testi-meta { font-size: 12px; color: rgba(255,255,255,.35); }
+  .testi-product { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--orange); margin-top: 3px; }
+
+  .testi-dots { display: flex; gap: 6px; justify-content: center; margin-top: 32px; }
+  .testi-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.18); cursor: pointer; transition: background .2s, transform .2s; border: none; }
+  .testi-dot.active { background: var(--orange); transform: scale(1.3); }
+
+  .testi-submit {
+    margin-top: 48px; padding: 28px 32px;
+    border: 1px solid rgba(255,255,255,.08); border-radius: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap; background: rgba(255,255,255,.03);
+  }
+  .testi-submit p { font-size: 14px; color: rgba(255,255,255,.45); line-height: 1.55; max-width: 420px; }
+  .testi-submit p strong { color: rgba(255,255,255,.7); font-weight: 600; }
+  .btn-submit-review { font-size: 13.5px; font-weight: 600; border: 1.5px solid rgba(255,255,255,.2); color: #fff; padding: 11px 22px; border-radius: 100px; white-space: nowrap; transition: border-color .2s, background .2s; }
+  .btn-submit-review:hover { border-color: var(--orange); background: rgba(232,80,26,.1); }
+
   /* ── ABOUT ── */
   .about-section {
     padding: 96px clamp(24px, 5vw, 72px);
@@ -625,6 +703,31 @@
   </div>
 </section>
 
+<!-- TESTIMONIALS -->
+<section class="testi-section" id="testimonials">
+  <div class="testi-header reveal">
+    <div class="testi-header-left">
+      <div class="eyebrow"><span class="line"></span>Customer Stories</div>
+      <h2 class="section-label">Real orders. Real people.</h2>
+    </div>
+    <div class="testi-avg">
+      <div class="stars">★★★★★</div>
+      <div class="testi-avg-right">
+        <div class="avg-score">5.0</div>
+        <div class="avg-label">from verified buyers</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="testi-track reveal" id="testiTrack"></div>
+  <div class="testi-dots" id="testiDots"></div>
+
+  <div class="testi-submit reveal">
+    <p><strong>Ordered from us recently?</strong> We'd love to hear about your experience. Share your feedback and help other customers discover what's possible.</p>
+    <a href="mailto:impressify3d@gmail.com?subject=My%20Impressify3D%20Review&body=Hi!%20I'd%20like%20to%20share%20my%20experience%20with%20Impressify3D.%0A%0AProduct%20ordered:%0AMy%20review:%0AMy%20name%20(for%20the%20website):%0ACity:" class="btn-submit-review">Share your experience →</a>
+  </div>
+</section>
+
 <!-- ABOUT -->
 <section class="about-section">
   <div class="about-grid">
@@ -767,6 +870,71 @@ function initNav() {
   `;
 }
 
+// ── TESTIMONIALS DATA ─────────────────────────────────────────
+// Replace these with real customer quotes. Set featured:true on one to highlight it.
+const TESTIMONIALS = [
+  { name:'Priya S.',   city:'Pune',        ordered:'Custom Name Plate',       quote:'The finish quality was stunning — better than anything I found online. Delivered in 5 days and arrived perfectly packed.', rating:5, featured:true,  verified:true },
+  { name:'Rahul M.',   city:'Mumbai',      ordered:'Wall-Mounted Mandir',     quote:'Gifted this to my parents for their anniversary. They loved the craftsmanship — every detail is perfect.',                 rating:5, featured:false, verified:true },
+  { name:'Aisha K.',   city:'Nashik',      ordered:'Jharokha Decor Piece',    quote:'Ordered a custom jharokha for our office reception. Everyone who walks in asks where it came from.',                       rating:5, featured:false, verified:true },
+  { name:'Vikram D.',  city:'Nagpur',      ordered:'Heritage Temple Model',   quote:'Precise, detailed, and delivered on time. The resin finish on this model is genuinely gallery-quality.',                   rating:5, featured:false, verified:true },
+  { name:'Sneha R.',   city:'Aurangabad',  ordered:'3D Text Decor',           quote:'Got our family name as a 3D wall piece. The team was super helpful with sizing and colour. Will order again.',              rating:5, featured:false, verified:true },
+  { name:'Arjun P.',   city:'Thane',       ordered:'Circular Temple Model',   quote:'Was sceptical at first but the quality exceeded my expectations. The level of detail at this price is unreal.',             rating:5, featured:false, verified:true },
+];
+
+// ── BUILD TESTIMONIALS ────────────────────────────────────────
+function buildTestimonials() {
+  const track  = document.getElementById('testiTrack');
+  const dotsEl = document.getElementById('testiDots');
+  if (!track || !dotsEl) return;
+
+  // Featured card first
+  const sorted = [...TESTIMONIALS].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+
+  sorted.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'testi-card' + (t.featured ? ' featured-card' : '');
+    card.innerHTML = `
+      <div class="testi-top">
+        <div class="testi-stars">${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}</div>
+        ${t.verified ? '<span class="testi-verified">Verified buyer</span>' : ''}
+      </div>
+      <div class="testi-quote">${t.quote}</div>
+      <div class="testi-footer">
+        <div class="testi-name">${t.name}</div>
+        <div class="testi-meta">${t.city}</div>
+        <div class="testi-product">${t.ordered}</div>
+      </div>`;
+    track.appendChild(card);
+
+    const dot = document.createElement('button');
+    dot.className = 'testi-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Go to testimonial ${i + 1}`);
+    dot.addEventListener('click', () => {
+      track.scrollTo({ left: card.offsetLeft - 24, behavior: 'smooth' });
+    });
+    dotsEl.appendChild(dot);
+  });
+
+  // Sync active dot on scroll
+  const dots  = dotsEl.querySelectorAll('.testi-dot');
+  const cards = track.querySelectorAll('.testi-card');
+  track.addEventListener('scroll', () => {
+    let closest = 0, minDist = Infinity;
+    cards.forEach((c, i) => {
+      const dist = Math.abs(c.getBoundingClientRect().left - track.getBoundingClientRect().left);
+      if (dist < minDist) { minDist = dist; closest = i; }
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === closest));
+  }, { passive: true });
+
+  // Drag-to-scroll on desktop
+  let isDown = false, startX, scrollLeft;
+  track.addEventListener('mousedown',  e => { isDown = true; track.classList.add('grabbing'); startX = e.pageX - track.offsetLeft; scrollLeft = track.scrollLeft; });
+  track.addEventListener('mouseleave', () => { isDown = false; track.classList.remove('grabbing'); });
+  track.addEventListener('mouseup',    () => { isDown = false; track.classList.remove('grabbing'); });
+  track.addEventListener('mousemove',  e => { if (!isDown) return; e.preventDefault(); track.scrollLeft = scrollLeft - (e.pageX - track.offsetLeft - startX) * 1.5; });
+}
+
 // ── REVEAL ON SCROLL ──────────────────────────────────────────────────────────
 function initReveal() {
   const els = document.querySelectorAll('.reveal');
@@ -782,6 +950,7 @@ document.addEventListener('DOMContentLoaded', () => {
   buildHeroMosaic(FALLBACK_ITEMS);
   buildRail(FALLBACK_ITEMS);
   buildSplitImages(FALLBACK_ITEMS);
+  buildTestimonials();
   initReveal();
 });
 </script>
