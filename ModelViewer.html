@@ -1,654 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Impressify3D — 3D Model Viewer</title>
-<meta name="description" content="Explore Impressify3D pieces in full 3D — rotate, zoom and inspect every detail before you order. Upload your own .glb file to preview instantly.">
-<meta property="og:title" content="3D Model Viewer — Impressify3D">
-<meta property="og:image" content="https://raw.githubusercontent.com/sandeepj02081979/Impressify3d/main/room_2x.jpeg">
-
-<!-- Google model-viewer web component -->
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-<style>
-:root {
-  --bg:#FAFAF8; --surface:#FFFFFF; --panel:#F2F1ED;
-  --border:#E5E4DF; --ink:#1A1A1C; --ink-mid:#6B6B70; --ink-soft:#9A9A9F;
-  --orange:#E8501A; --orange-lt:#FFF0EB; --orange-dk:#cc4315;
-  --green:#1d8348; --display:'Space Grotesk',sans-serif; --body:'Inter',sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:var(--body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
-a{color:inherit;text-decoration:none;}
-
-/* ── NAV ── */
-header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,5vw,64px);height:58px;background:rgba(250,250,248,.92);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid var(--border);}
-.logo{font-family:var(--display);font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px;}
-.logo .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);}
-nav ul{display:flex;list-style:none;}
-nav a{font-size:13.5px;color:var(--ink-mid);padding:6px 14px;border-radius:100px;transition:color .2s,background .2s;}
-nav a:hover{color:var(--ink);background:var(--panel);}
-nav a.active{color:var(--ink);font-weight:600;}
-.nav-links{display:flex;align-items:center;}
-.nav-cta{font-size:13px;font-weight:600;background:var(--orange);color:#fff;padding:9px 20px;border-radius:100px;transition:background .2s;}
-.nav-cta:hover{background:var(--orange-dk);}
-@media(max-width:720px){.nav-links{display:none;}}
-
-/* ── PAGE LAYOUT ── */
-.page{padding-top:58px;min-height:100vh;display:grid;grid-template-columns:320px 1fr;grid-template-rows:auto 1fr;}
-@media(max-width:960px){.page{grid-template-columns:1fr;}}
-
-/* ── LEFT SIDEBAR ── */
-.sidebar{grid-row:1/3;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 58px);position:sticky;top:58px;}
-@media(max-width:960px){.sidebar{grid-row:auto;max-height:none;position:static;border-right:none;border-bottom:1px solid var(--border);}}
-
-.sidebar-head{padding:28px 24px 20px;border-bottom:1px solid var(--border);}
-.sidebar-eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
-.sidebar-title{font-family:var(--display);font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--ink);}
-.sidebar-sub{font-size:13px;color:var(--ink-mid);margin-top:4px;line-height:1.5;}
-
-/* model list */
-.model-list{flex:1;overflow-y:auto;padding:12px 0;}
-.model-item{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;transition:background .15s;border-left:3px solid transparent;}
-.model-item:hover{background:var(--panel);}
-.model-item.active{background:var(--orange-lt);border-left-color:var(--orange);}
-.model-thumb{width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--panel);flex-shrink:0;border:1px solid var(--border);}
-.model-thumb-placeholder{width:52px;height:52px;border-radius:10px;background:var(--panel);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.model-info{min-width:0;}
-.model-name{font-size:13.5px;font-weight:600;color:var(--ink);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.model-tag{font-size:11px;color:var(--ink-mid);margin-top:2px;}
-.model-status{display:flex;align-items:center;gap:5px;margin-top:4px;}
-.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.status-dot.has-model{background:var(--green);}
-.status-dot.no-model{background:var(--border);}
-.status-label{font-size:10.5px;color:var(--ink-soft);}
-
-/* upload zone */
-.upload-zone{margin:12px 16px;padding:18px;border:1.5px dashed var(--border);border-radius:14px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--orange);background:var(--orange-lt);}
-.upload-icon{font-size:24px;margin-bottom:6px;}
-.upload-text{font-size:12.5px;color:var(--ink-mid);line-height:1.5;}
-.upload-text strong{color:var(--ink);display:block;margin-bottom:2px;}
-.upload-hint{font-size:11px;color:var(--ink-soft);margin-top:4px;}
-#file-input{display:none;}
-
-/* ── PAGE HEADER (above viewer) ── */
-.viewer-topbar{padding:20px clamp(20px,3vw,40px) 0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-.active-model-name{font-family:var(--display);font-size:clamp(18px,2vw,24px);font-weight:600;letter-spacing:-.02em;color:var(--ink);}
-.active-model-tag{font-size:13px;color:var(--ink-mid);margin-top:3px;}
-.topbar-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
-.tb-btn{font-family:var(--body);font-size:13px;font-weight:500;padding:9px 18px;border-radius:100px;cursor:pointer;transition:background .2s,border-color .2s,color .2s;border:1.5px solid var(--border);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;gap:6px;}
-.tb-btn:hover{border-color:var(--orange);color:var(--orange);}
-.tb-btn.primary{background:var(--orange);color:#fff;border-color:var(--orange);}
-.tb-btn.primary:hover{background:var(--orange-dk);}
-
-/* ── VIEWER AREA ── */
-.viewer-wrap{padding:16px clamp(20px,3vw,40px) 0;position:relative;}
-.viewer-container{background:var(--panel);border-radius:20px;overflow:hidden;position:relative;border:1px solid var(--border);}
-.viewer-ar{aspect-ratio:16/9;}
-@media(max-width:960px){.viewer-ar{aspect-ratio:4/3;}}
-@media(max-width:600px){.viewer-ar{aspect-ratio:1/1;}}
-
-model-viewer{
-  width:100%;height:100%;
-  --mv-theme-button-color:var(--orange);
-  background:transparent;
-}
-
-/* no-model placeholder */
-.no-model-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;}
-.no-model-placeholder .big-icon{font-size:56px;opacity:.25;}
-.no-model-placeholder p{font-size:14px;color:var(--ink-soft);text-align:center;max-width:280px;line-height:1.65;}
-.no-model-placeholder .upload-cta{font-size:13px;font-weight:600;color:var(--orange);border:1.5px solid var(--orange);padding:9px 20px;border-radius:100px;cursor:pointer;background:none;font-family:var(--body);transition:background .2s;}
-.no-model-placeholder .upload-cta:hover{background:var(--orange-lt);}
-
-/* loading overlay */
-.viewer-loading{position:absolute;inset:0;background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border-radius:20px;z-index:10;transition:opacity .4s;}
-.viewer-loading.hidden{opacity:0;pointer-events:none;}
-.loader-ring{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.loader-text{font-size:13px;color:var(--ink-mid);}
-
-/* viewer controls hint */
-.viewer-hints{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;padding:12px 0 4px;}
-.hint{font-size:11.5px;color:var(--ink-soft);display:flex;align-items:center;gap:5px;}
-.hint-icon{font-size:14px;}
-
-/* ── DETAILS PANEL ── */
-.details-panel{padding:20px clamp(20px,3vw,40px) 48px;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-@media(max-width:600px){.details-panel{grid-template-columns:1fr;}}
-
-.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;}
-.detail-card-title{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:14px;}
-.spec-rows{display:flex;flex-direction:column;gap:10px;}
-.spec-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
-.spec-label{font-size:13px;color:var(--ink-mid);}
-.spec-val{font-size:13px;font-weight:600;color:var(--ink);text-align:right;}
-.spec-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;}
-.badge-mat{background:var(--panel);color:var(--ink-mid);border:1px solid var(--border);}
-.badge-price{background:var(--orange-lt);color:var(--orange);border:1px solid rgba(232,80,26,.2);}
-.badge-new{background:#e8f5e9;color:var(--green);border:1px solid #a5d6a7;}
-.badge-custom{background:#fff3e0;color:#e65100;border:1px solid #ffcc80;}
-
-.action-card{background:var(--ink);border:1px solid var(--ink);border-radius:16px;padding:24px 22px;display:flex;flex-direction:column;gap:14px;}
-.action-card-title{font-family:var(--display);font-size:16px;font-weight:600;color:#fff;letter-spacing:-.01em;}
-.action-card-sub{font-size:13px;color:rgba(255,255,255,.45);line-height:1.55;}
-.action-btns{display:flex;flex-direction:column;gap:8px;}
-.btn-wa-full{font-family:var(--body);font-size:13.5px;font-weight:600;background:#25d366;color:#fff;border:none;padding:11px 18px;border-radius:100px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:background .2s;}
-.btn-wa-full:hover{background:#1da851;}
-.btn-quote-full{font-family:var(--body);font-size:13.5px;font-weight:500;background:rgba(255,255,255,.07);color:#fff;border:1.5px solid rgba(255,255,255,.15);padding:11px 18px;border-radius:100px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:background .2s,border-color .2s;}
-.btn-quote-full:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);}
-
-/* ── ENV + EXPOSURE controls ── */
-.viewer-controls{padding:0 clamp(20px,3vw,40px) 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-.ctrl-label{font-size:12px;color:var(--ink-soft);margin-right:4px;}
-.env-btn{font-family:var(--body);font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;border:1.5px solid var(--border);background:var(--surface);color:var(--ink-mid);cursor:pointer;transition:all .18s;}
-.env-btn:hover{border-color:var(--ink-mid);color:var(--ink);}
-.env-btn.active{border-color:var(--orange);background:var(--orange-lt);color:var(--orange);}
-
-/* ── ANIMATION TOGGLE ── */
-.anim-row{padding:0 clamp(20px,3vw,40px) 12px;display:flex;align-items:center;gap:10px;}
-.toggle-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;}
-.toggle-track{width:36px;height:20px;background:var(--border);border-radius:100px;position:relative;transition:background .2s;flex-shrink:0;}
-.toggle-track.on{background:var(--orange);}
-.toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
-.toggle-track.on .toggle-thumb{left:19px;}
-.toggle-label{font-size:12.5px;color:var(--ink-mid);}
-
-/* ── HOW TO ADD MODELS (info strip) ── */
-.how-strip{margin:0 clamp(20px,3vw,40px) 0;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px 24px;display:flex;align-items:flex-start;gap:16px;}
-.how-strip-icon{font-size:22px;flex-shrink:0;margin-top:1px;}
-.how-strip-body{font-size:13px;color:var(--ink-mid);line-height:1.65;}
-.how-strip-body strong{color:var(--ink);}
-.how-strip-body code{font-size:11.5px;background:var(--border);padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--ink);}
-
-/* ── WA FLOAT ── */
-.wa-float{position:fixed;bottom:24px;right:24px;z-index:200;width:54px;height:54px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);transition:transform .2s;}
-.wa-float:hover{transform:scale(1.08);}
-.wa-float svg{width:26px;height:26px;fill:#fff;}
-
-/* ── FOOTER ── */
-footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px,5vw,72px);border-top:1px solid var(--border);}
-.footer-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.footer-bottom p{font-size:12px;}
-.footer-bottom a{color:rgba(255,255,255,.4);transition:color .2s;}
-.footer-bottom a:hover{color:#fff;}
-
-.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
-.reveal.in{opacity:1;transform:none;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Model Viewer - Impressify3D</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f5f5f7;
+      color: #1d1d1f;
+    }
+    .viewer-container {
+      max-width: 1200px;
+      margin: 80px auto 40px auto;
+      padding: 0 20px;
+      position: relative;
+    }
+    .canvas-container {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      height: 70vh;
+    }
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+    }
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid #e5e5e7;
+      border-top: 3px solid #0071e3;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .info-panel {
+      margin-top: 24px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .model-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.5px;
+    }
+    .model-description {
+      color: #86868b;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .upload-container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    .upload-box {
+      border: 2px dashed #d2d2d7;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      background: #ffffff;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+    .upload-box:hover {
+      border-color: #0071e3;
+    }
+    .upload-box input[type="file"] {
+      display: none;
+    }
+    .upload-label {
+      color: #0071e3;
+      font-weight: 500;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-<!-- NAV -->
-<header>
-  <a href="index.html" class="logo"><span class="dot"></span>IMPRESSIFY3D</a>
-  <nav><ul class="nav-links"></ul></nav>
-  <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="nav-cta">Request a Quote</a>
-</header>
+  <header style="position: fixed; top: 0; width: 100%; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); z-index: 100; border-bottom: 1px solid #e5e5e7;">
+    <nav style="max-width: 1200px; margin: 0 auto; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
+      <a href="index.html" style="font-weight: 600; text-decoration: none; color: #1d1d1f; font-size: 19px;">Impressify3D</a>
+      <ul class="nav-links" style="display: flex; list-style: none; gap: 24px; margin: 0; padding: 0;"></ul>
+    </nav>
+  </header>
 
-<div class="page">
-
-  <!-- ── SIDEBAR ── -->
-  <aside class="sidebar">
-    <div class="sidebar-head">
-      <div class="sidebar-eyebrow">3D Viewer</div>
-      <div class="sidebar-title">Browse models</div>
-      <div class="sidebar-sub">Click any piece to inspect it in 3D. Drag to rotate, scroll to zoom.</div>
+  <div class="viewer-container">
+    <div id="loader" class="loading-overlay">
+      <div class="spinner"></div>
+      <p id="loading-text">Loading 3D Model...</p>
     </div>
-
-    <div class="model-list" id="model-list">
-      <!-- populated by JS -->
+    <div class="canvas-container">
+      <model-viewer id="main-viewer" camera-controls auto-rotate shadow-intensity="1" environment-image="neutral" exposure="1"></model-viewer>
     </div>
-
-    <!-- Upload your own -->
-    <div style="padding:0 12px 16px;">
-      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
-        <div class="upload-icon">📁</div>
-        <div class="upload-text">
-          <strong>Upload your own model</strong>
-          Drop a .glb or .gltf file here
-        </div>
-        <div class="upload-hint">Preview before you send it to us</div>
-      </div>
-      <input type="file" id="file-input" accept=".glb,.gltf" />
-    </div>
-  </aside>
-
-  <!-- ── MAIN CONTENT ── -->
-  <main>
-
-    <!-- Topbar -->
-    <div class="viewer-topbar reveal">
-      <div>
-        <div class="active-model-name" id="active-name">Select a model</div>
-        <div class="active-model-tag" id="active-tag">← Choose from the list</div>
-      </div>
-      <div class="topbar-actions">
-        <button class="tb-btn" id="btn-reset" onclick="resetCamera()" title="Reset camera">↺ Reset view</button>
-        <button class="tb-btn" id="btn-ar" style="display:none" onclick="launchAR()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-          View in AR
-        </button>
-        <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="tb-btn primary">Order this →</a>
-      </div>
-    </div>
-
-    <!-- Environment controls -->
-    <div class="viewer-controls reveal" style="margin-top:14px;">
-      <span class="ctrl-label">Environment:</span>
-      <button class="env-btn active" data-env="neutral" onclick="setEnv(this,'neutral')">Neutral</button>
-      <button class="env-btn" data-env="legacy" onclick="setEnv(this,'legacy')">Studio</button>
-      <button class="env-btn" data-env="sunset" onclick="setEnv(this,'sunset')">Warm</button>
-      <button class="env-btn" data-env="dawn" onclick="setEnv(this,'dawn')">Cool</button>
-    </div>
-
-    <!-- Auto-rotate toggle -->
-    <div class="anim-row reveal">
-      <div class="toggle-wrap" onclick="toggleRotate()">
-        <div class="toggle-track on" id="rotate-track"><div class="toggle-thumb"></div></div>
-        <span class="toggle-label">Auto-rotate</span>
-      </div>
-    </div>
-
-    <!-- Viewer -->
-    <div class="viewer-wrap reveal">
-      <div class="viewer-container viewer-ar" id="viewer-container">
-
-        <!-- Loading overlay -->
-        <div class="viewer-loading" id="viewer-loading">
-          <div class="loader-ring"></div>
-          <div class="loader-text" id="loader-text">Loading model…</div>
-        </div>
-
-        <!-- Placeholder (no model selected) -->
-        <div class="no-model-placeholder" id="no-model-placeholder">
-          <div class="big-icon">⬡</div>
-          <p>Select a piece from the sidebar to view it in full 3D, or upload your own .glb file.</p>
-          <button class="upload-cta" onclick="document.getElementById('file-input').click()">Upload a model</button>
-        </div>
-
-        <!-- The actual model-viewer -->
-        <model-viewer
-          id="mv"
-          style="width:100%;height:100%;display:none;"
-          camera-controls
-          auto-rotate
-          rotation-per-second="30deg"
-          shadow-intensity="1"
-          shadow-softness="0.8"
-          exposure="1"
-          environment-image="neutral"
-          ar
-          ar-modes="webxr scene-viewer quick-look"
-          loading="eager"
-        >
-          <!-- AR button (rendered by model-viewer) -->
-          <button slot="ar-button" style="display:none"></button>
-
-          <!-- Progress bar inside model-viewer -->
-          <div slot="progress-bar" style="display:none"></div>
-        </model-viewer>
-
-      </div>
-
-      <!-- Interaction hints -->
-      <div class="viewer-hints" id="viewer-hints" style="opacity:0;transition:opacity .4s;">
-        <span class="hint"><span class="hint-icon">🖱️</span>Drag to rotate</span>
-        <span class="hint"><span class="hint-icon">🔍</span>Scroll to zoom</span>
-        <span class="hint"><span class="hint-icon">✋</span>Right-click to pan</span>
-        <span class="hint"><span class="hint-icon">📱</span>Pinch on mobile</span>
-      </div>
-    </div>
-
-    <!-- How to add models info -->
-    <div class="how-strip reveal" style="margin-top:16px;">
-      <div class="how-strip-icon">💡</div>
-      <div class="how-strip-body">
-        <strong>Adding a real 3D model:</strong> Export your design as <code>.glb</code> from Blender or Fusion 360, commit it to the <code>Impressify3d</code> GitHub repo, then add its filename as <code>model_github_path</code> in <code>datamodel.js</code>. The viewer will load it automatically straight from GitHub. Until then, use the upload button above to preview customer-sent files.
-      </div>
-    </div>
-
-    <!-- Details panel -->
-    <div class="details-panel" id="details-panel" style="display:none;">
-
-      <div class="detail-card reveal">
-        <div class="detail-card-title">Product specs</div>
-        <div class="spec-rows" id="spec-rows">
-          <!-- populated by JS -->
-        </div>
-      </div>
-
-      <div class="action-card reveal">
-        <div class="action-card-title" id="action-title">Interested in this piece?</div>
-        <div class="action-card-sub" id="action-sub">Tell us your size, material preference, and any customisations — we'll confirm a quote within 24 hours.</div>
-        <div class="action-btns">
-          <a href="#" id="action-wa" class="btn-wa-full" target="_blank">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Enquire on WhatsApp
-          </a>
-          <a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank" class="btn-quote-full">Request a confirmed quote</a>
-        </div>
-      </div>
-
-    </div>
-
-  </main>
-</div>
-
-<!-- WA FLOAT -->
-<a class="wa-float" id="wa-float" href="#" target="_blank" aria-label="WhatsApp">
-  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-</a>
-
-<footer>
-  <div class="footer-bottom">
-    <p>© 2026 Impressify3D. All rights reserved.</p>
-    <div style="display:flex;gap:20px;">
-      <a href="ProductGallery.html">Gallery</a>
-      <a href="Gifting.html">Gifts</a>
-      <a href="Wallpapers.html">Wallpapers</a>
-      <a href="QuoteEstimator.html">Estimator</a>
+    <div class="info-panel">
+      <h1 id="viewer-title" class="model-title">3D Model Viewer</h1>
+      <p id="viewer-desc" class="model-description">Loading model details...</p>
     </div>
   </div>
-</footer>
 
-<script src="datamodel.js"></script>
-<script>
-// ── GITHUB REPO CONFIG (asset hosting) ─────────────────────────
-// GITHUB_USER / GITHUB_REPO / GITHUB_BRANCH / GITHUB_RAW_BASE and
-// the githubUrl() helper are already defined in datamodel.js
-// (loaded above). Reuse it here instead of redeclaring — classic
-// <script> tags share one global scope, so a duplicate `const`
-// would throw a SyntaxError and silently kill this whole block.
-function ghUrl(path) { return githubUrl(path); }
-
-// ── DEMO MODEL (real .glb committed to the repo) ────────────────
-// TestModel-optimized.glb lives at the repo root and is used as the
-// showcase model for every item until per-item model_github_path
-// values are added in datamodel.js.
-const DEFAULT_GLB = 'TestModel-optimized.glb';
-const DEMO_MODELS = {
-  'mandir-01':          DEFAULT_GLB,
-  'text-decor-01':      DEFAULT_GLB,
-  'jharokha-01':         DEFAULT_GLB,
-  'circular-temple-01': DEFAULT_GLB,
-};
-
-const WHATSAPP_NUM  = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.whatsapp_number : '';
-const QUOTE_URL     = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.quote_form_url  : '#';
-
-// ── STATE ─────────────────────────────────────────────────────
-const mv        = document.getElementById('mv');
-const loading   = document.getElementById('viewer-loading');
-const placeholder = document.getElementById('no-model-placeholder');
-const hints     = document.getElementById('viewer-hints');
-const detailsPanel = document.getElementById('details-panel');
-let   activeItem = null;
-let   autoRotate = true;
-
-// ── NAV (inline, doesn't need data.js nav) ────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof initGlobalNavigation === 'function') initGlobalNavigation();
-
-  // WA float
-  if (WHATSAPP_NUM && !WHATSAPP_NUM.includes('X')) {
-    const msg = encodeURIComponent('Hi! I was browsing the Impressify3D 3D viewer and would like to enquire about an order.');
-    document.getElementById('wa-float').href = `https://wa.me/${WHATSAPP_NUM}?text=${msg}`;
-  } else {
-    document.getElementById('wa-float').href = QUOTE_URL;
-  }
-});
-
-// ── BUILD SIDEBAR LIST ────────────────────────────────────────
-async function buildSidebar() {
-  const allItems = (typeof loadItems === 'function') ? await loadItems() : FALLBACK_ITEMS_INLINE;
-  const list = document.getElementById('model-list');
-  list.innerHTML = '';
-
-  allItems.forEach(item => {
-    const hasModel = !!item.model_github_path || !!DEMO_MODELS[item.id];
-    const el = document.createElement('div');
-    el.className = 'model-item';
-    el.dataset.id = item.id;
-
-    const thumbSrc = item.image_github_path
-      ? ghUrl(item.image_github_path)
-      : null;
-
-    el.innerHTML = `
-      ${thumbSrc
-        ? `<img class="model-thumb" src="${thumbSrc}" alt="${item.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-           <div class="model-thumb-placeholder" style="display:none">⬡</div>`
-        : `<div class="model-thumb-placeholder">⬡</div>`}
-      <div class="model-info">
-        <div class="model-name">${item.title.split('–')[0].trim()}</div>
-        <div class="model-tag">${item.tag_label}</div>
-        <div class="model-status">
-          <span class="status-dot ${hasModel ? 'has-model' : 'no-model'}"></span>
-          <span class="status-label">${hasModel ? '3D model ready' : 'Image only'}</span>
-        </div>
-      </div>`;
-    el.addEventListener('click', () => loadModel(item, el));
-    list.appendChild(el);
-  });
-
-  // Auto-load first item that has a model
-  const firstWithModel = allItems.find(i => i.model_github_path || DEMO_MODELS[i.id]);
-  if (firstWithModel) {
-    const firstEl = list.querySelector(`[data-id="${firstWithModel.id}"]`);
-    if (firstEl) loadModel(firstWithModel, firstEl);
-  }
-}
-
-// ── LOAD MODEL INTO VIEWER ────────────────────────────────────
-function loadModel(item, listEl) {
-  // Update sidebar active state
-  document.querySelectorAll('.model-item').forEach(el => el.classList.remove('active'));
-  listEl.classList.add('active');
-  activeItem = item;
-
-  // Resolve model URL
-  // Priority: item.model_github_path → DEMO_MODELS fallback (e.g. TestModel-optimized.glb)
-  let modelUrl = null;
-  if (item.model_github_path && !item.model_github_path.startsWith('REPLACE')) {
-    // Served straight from the GitHub repo — no conversion needed
-    modelUrl = ghUrl(item.model_github_path);
-  } else if (DEMO_MODELS[item.id]) {
-    modelUrl = ghUrl(DEMO_MODELS[item.id]);
-  }
-
-  // Update topbar
-  document.getElementById('active-name').textContent = item.title;
-  document.getElementById('active-tag').textContent   = item.tag_label;
-
-  if (!modelUrl) {
-    // No 3D model — show image fallback in placeholder
-    placeholder.innerHTML = `
-      <img src="${ghUrl(item.image_github_path)}"
-           style="max-height:70%;max-width:90%;object-fit:contain;border-radius:12px;opacity:.85" alt="${item.title}">
-      <p style="margin-top:12px">3D model coming soon — viewing product image.</p>
-      <button class="upload-cta" onclick="document.getElementById('file-input').click()">Upload a .glb to preview</button>`;
-    mv.style.display = 'none';
-    placeholder.style.display = 'flex';
-    loading.classList.add('hidden');
-    showDetails(item);
-    return;
-  }
-
-  // Show loading
-  mv.style.display = 'none';
-  placeholder.style.display = 'none';
-  loading.classList.remove('hidden');
-  document.getElementById('loader-text').textContent = 'Loading 3D model…';
-
-  // Set src on model-viewer
-  mv.src = modelUrl;
-  mv.style.display = 'block';
-
-  showDetails(item);
-}
-
-// ── MODEL VIEWER EVENTS ───────────────────────────────────────
-mv.addEventListener('load', () => {
-  loading.classList.add('hidden');
-  hints.style.opacity = '1';
-  // Check AR support
-  if (mv.canActivateAR) {
-    document.getElementById('btn-ar').style.display = 'flex';
-  }
-});
-
-mv.addEventListener('error', () => {
-  loading.classList.add('hidden');
-  document.getElementById('loader-text').textContent = 'Could not load model.';
-  loading.classList.remove('hidden');
-  setTimeout(() => loading.classList.add('hidden'), 2500);
-});
-
-// ── SHOW DETAILS PANEL ────────────────────────────────────────
-function showDetails(item) {
-  detailsPanel.style.display = 'grid';
-  const specs = document.getElementById('spec-rows');
-  const mats  = (item.materials || []).join(', ') || 'PLA+';
-  const price  = item.price_tier || '₹₹';
-  const ship   = item.delivery_days ? `${item.delivery_days} working days` : '5–7 days';
-
-  specs.innerHTML = `
-    <div class="spec-row"><span class="spec-label">Category</span><span class="spec-val">${item.tag_label}</span></div>
-    <div class="spec-row"><span class="spec-label">Material</span>
-      <span>${(item.materials || ['PLA+']).map(m => `<span class="spec-badge badge-mat">${m}</span>`).join(' ')}</span>
+  <div class="upload-container">
+    <div class="upload-box" onclick="document.getElementById('file-input').click()">
+      <label for="file-input" class="upload-label">
+        <span>Click to upload or drag a <strong>.glb</strong> file here</span>
+      </label>
+      <input type="file" id="file-input" accept=".glb" />
     </div>
-    <div class="spec-row"><span class="spec-label">Price range</span><span class="spec-badge badge-price">${price}</span></div>
-    <div class="spec-row"><span class="spec-label">Ships in</span><span class="spec-val">${ship}</span></div>
-    ${item.is_customizable ? `<div class="spec-row"><span class="spec-label">Custom orders</span><span class="spec-badge badge-custom">Available</span></div>` : ''}
-    ${item.is_new || isNewItem(item) ? `<div class="spec-row"><span class="spec-label">Status</span><span class="spec-badge badge-new">New arrival</span></div>` : ''}`;
+  </div>
 
-  // Action card
-  document.getElementById('action-title').textContent = item.title.split('–')[0].trim();
-  document.getElementById('action-sub').textContent   = item.gallery_desc;
-
-  // WA link
-  const num = WHATSAPP_NUM;
-  const msg = encodeURIComponent(`Hi! I just viewed "${item.title}" on the Impressify3D 3D viewer and I'd like to place an order. Please share pricing and delivery details.`);
-  document.getElementById('action-wa').href = (num && !num.includes('X'))
-    ? `https://wa.me/${num}?text=${msg}`
-    : QUOTE_URL;
-
-  // Trigger reveal animations
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.details-panel .reveal').forEach(el => {
-      el.classList.remove('in');
-      requestAnimationFrame(() => el.classList.add('in'));
+  <script src="datamodel.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initViewer();
     });
-  });
-}
 
-// ── CAMERA RESET ──────────────────────────────────────────────
-function resetCamera() {
-  mv.cameraOrbit = 'auto auto auto';
-  mv.cameraTarget = 'auto auto auto';
-  mv.fieldOfView = 'auto';
-}
+    async function initViewer() {
+      const viewer = document.getElementById('main-viewer');
+      const loader = document.getElementById('loader');
+      const loadingText = document.getElementById('loading-text');
+      const titleElem = document.getElementById('viewer-title');
+      const descElem = document.getElementById('viewer-desc');
+      const fileInput = document.getElementById('file-input');
 
-// ── AR LAUNCH ─────────────────────────────────────────────────
-function launchAR() { mv.activateAR(); }
+      viewer.addEventListener('progress', (event) => {
+        const progress = Math.round(event.detail.totalProgress * 100);
+        loadingText.innerText = `Loading... ${progress}%`;
+        if (progress >= 100) {
+          loader.classList.add('hidden');
+        }
+      });
 
-// ── ENVIRONMENT ───────────────────────────────────────────────
-function setEnv(btn, env) {
-  document.querySelectorAll('.env-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  mv.environmentImage = env;
-}
+      viewer.addEventListener('load', () => {
+        loader.classList.add('hidden');
+      });
 
-// ── AUTO-ROTATE TOGGLE ────────────────────────────────────────
-function toggleRotate() {
-  autoRotate = !autoRotate;
-  mv.autoRotate = autoRotate;
-  const track = document.getElementById('rotate-track');
-  track.classList.toggle('on', autoRotate);
-}
+      viewer.addEventListener('error', (err) => {
+        loadingText.innerText = "Error loading model.";
+        console.error(err);
+      });
 
-// ── FILE UPLOAD ───────────────────────────────────────────────
-const fileInput  = document.getElementById('file-input');
-const uploadZone = document.getElementById('upload-zone');
+      const urlParams = new URLSearchParams(window.location.search);
+      const modelId = urlParams.get('id');
 
-fileInput.addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  handleUploadedFile(file);
-});
+      const items = await loadItems();
+      const currentItem = items.find(item => item.id === modelId) || items[0];
 
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && (file.name.endsWith('.glb') || file.name.endsWith('.gltf'))) handleUploadedFile(file);
-});
+      if (currentItem) {
+        viewer.src = ''; // Clear source to handle sequential load updates cleanly
+        titleElem.innerText = currentItem.title;
+        descElem.innerText = currentItem.gallery_desc;
+        viewer.src = githubUrl(currentItem.model_github_path);
+      } else {
+        loader.classList.add('hidden');
+        titleElem.innerText = "No Model Selected";
+        descElem.innerText = "Please select a model from the gallery.";
+      }
 
-function handleUploadedFile(file) {
-  const url = URL.createObjectURL(file);
-
-  // Deselect sidebar
-  document.querySelectorAll('.model-item').forEach(el => el.classList.remove('active'));
-  activeItem = null;
-
-  document.getElementById('active-name').textContent = file.name.replace(/\.(glb|gltf)$/, '');
-  document.getElementById('active-tag').textContent  = 'Uploaded model · Preview only';
-  document.getElementById('btn-ar').style.display = 'none';
-
-  mv.style.display = 'none';
-  placeholder.style.display = 'none';
-  loading.classList.remove('hidden');
-  document.getElementById('loader-text').textContent = 'Loading your model…';
-
-  mv.src = url;
-  mv.style.display = 'block';
-
-  // Simple detail card for uploaded file
-  detailsPanel.style.display = 'grid';
-  document.getElementById('spec-rows').innerHTML = `
-    <div class="spec-row"><span class="spec-label">File</span><span class="spec-val" style="font-size:12px;max-width:160px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${file.name}</span></div>
-    <div class="spec-row"><span class="spec-label">Size</span><span class="spec-val">${(file.size / 1024).toFixed(0)} KB</span></div>
-    <div class="spec-row"><span class="spec-label">Type</span><span class="spec-val">${file.name.split('.').pop().toUpperCase()}</span></div>`;
-  document.getElementById('action-title').textContent = 'Want to print this?';
-  document.getElementById('action-sub').textContent   = 'Send us this file and we\'ll review it, confirm printability, and give you a quote within 24 hours.';
-  const num = WHATSAPP_NUM;
-  const msg = encodeURIComponent(`Hi! I have a 3D model file I'd like to print with Impressify3D. File: ${file.name}. Please guide me on the next steps.`);
-  document.getElementById('action-wa').href = (num && !num.includes('X')) ? `https://wa.me/${num}?text=${msg}` : QUOTE_URL;
-}
-
-// ── SCROLL REVEAL ─────────────────────────────────────────────
-const revealObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); } });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
-
-// ── INLINE FALLBACK (if data.js not present) ──────────────────
-const FALLBACK_ITEMS_INLINE = [
-  { id:'mandir-01', title:'Wall-Mounted Mandir – Divine Elegance', tag_label:'Spiritual · Featured', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:5, is_customizable:false, gallery_desc:'Intricate carvings with a sacred aura.', is_new:false, added_date:'2025-01-01' },
-  { id:'jharokha-01', title:'Jharokha – The Royal Balcony', tag_label:'Heritage', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:6, is_customizable:false, gallery_desc:'Ornate jali work and geometric patterns.', is_new:false, added_date:'2025-01-01' },
-  { id:'circular-temple-01', title:'Eternal Harmony – The Circular Temple', tag_label:'Spiritual', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['Resin'], price_tier:'₹₹₹', delivery_days:7, is_customizable:false, gallery_desc:'Every curve symbolizes balance.', is_new:false, added_date:'2025-01-01' },
-  { id:'text-decor-01', title:'3D Text Decor – Personalized Elegance', tag_label:'Decor · Custom', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+','PETG'], price_tier:'₹', delivery_days:4, is_customizable:true, gallery_desc:'Bold lettering as a stylish desk piece.', is_new:false, added_date:'2025-01-01' },
-];
-
-function isNewItem(item) {
-  if (item.is_new) return true;
-  if (!item.added_date) return false;
-  return (new Date() - new Date(item.added_date)) / 86400000 <= 60;
-}
-
-// ── BOOT ─────────────────────────────────────────────────────
-buildSidebar();
-</script>
-
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file && file.name.endsWith('.glb')) {
+          loader.classList.remove('hidden');
+          loadingText.innerText = "Loading local file...";
+          const objectURL = URL.createObjectURL(file);
+          titleElem.innerText = file.name;
+          descElem.innerText = "Local file preview.";
+          viewer.src = ''; 
+          viewer.src = objectURL;
+        }
+      });
+    }
+  </script>
 </body>
 </html>

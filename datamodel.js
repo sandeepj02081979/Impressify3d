@@ -1,7 +1,7 @@
 /**
  * ─────────────────────────────────────────────────────────────
- *  Impressify3D  ·  Shared Content Layer
- *  data.js — single source of truth for all pages
+ * Impressify3D  ·  Shared Content Layer
+ * data.js — single source of truth for all pages
  * ─────────────────────────────────────────────────────────────
  */
 
@@ -31,14 +31,9 @@ const FALLBACK_ITEMS = [
     wallpaper_res: '4K · 3840×2160',
     wallpaper_tags: 'Spiritual,Heritage,Detailed,Great',
   },
-
 ];
 
 // ── IMAGE / MODEL URL HELPER ────────────────────────────────────
-// Builds a raw.githubusercontent.com URL for any file committed to
-// the repo (images, .glb models, etc). `path` should be the file's
-// path relative to the repo root, e.g. 'room_2x.jpeg' or
-// 'models/TestModel-optimized.glb'.
 function githubUrl(path) {
   if (!path || path.startsWith('REPLACE')) {
     return `https://via.placeholder.com/1200x900/f5f5f7/0071e3?text=Image+pending`;
@@ -46,8 +41,6 @@ function githubUrl(path) {
   return `${GITHUB_RAW_BASE}${path}`;
 }
 
-// Kept for backwards compatibility with any code still calling driveUrl().
-// Now simply routes to the GitHub-based helper above.
 function driveUrl(path) {
   return githubUrl(path);
 }
@@ -93,7 +86,7 @@ function initGlobalNavigation() {
   if (!navLinksContainer) return;
 
   const path = window.location.pathname;
-  const isHomePage = path === '/' || path.endsWith('index.html') || path.endsWith('home') || (!path.includes('ProductGallery') && !path.includes('Wallpapers'));
+  const isHomePage = path === '/' || path.endsWith('index.html') || path.endsWith('home') || (!path.includes('ProductGallery') && !path.includes('Wallpapers') && !path.includes('ModelViewer'));
 
   const homeBase = isHomePage ? '' : 'index.html';
   const galleryUrl = 'ProductGallery.html';
@@ -101,13 +94,14 @@ function initGlobalNavigation() {
 
   const isGalleryActive = path.includes('ProductGallery');
   const isWallpapersActive = path.includes('Wallpapers');
+  const isViewerActive = path.includes('ModelViewer');
 
   navLinksContainer.innerHTML = `
     <li><a href="${homeBase}#services">Services</a></li>
     <li><a href="${homeBase}#about">About</a></li>
     <li><a href="${galleryUrl}" class="${isGalleryActive ? 'active' : ''}">Gallery</a></li>
     <li><a href="${wallpapersUrl}" class="${isWallpapersActive ? 'active' : ''}">Wallpapers</a></li>
-    <li><a href="ModelViewer.html" class="${path.includes('ModelViewer') ? 'active' : ''}">3D Viewer</a></li>
+    <li><a href="ModelViewer.html" class="${isViewerActive ? 'active' : ''}">3D Viewer</a></li>
     <li><a href="mailto:impressify3d@gmail.com">Contact</a></li>
   `;
 }
