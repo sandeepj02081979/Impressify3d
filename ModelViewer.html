@@ -362,13 +362,12 @@ footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px
 <script src="datamodel.js"></script>
 <script>
 // ── GITHUB REPO CONFIG (asset hosting) ─────────────────────────
-// Images and .glb models are served directly from the GitHub repo
-// via raw.githubusercontent.com instead of Google Drive.
-const GITHUB_USER   = 'sandeepj02081979';
-const GITHUB_REPO   = 'Impressify3d';
-const GITHUB_BRANCH = 'main';
-const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
-function ghUrl(path) { return `${GITHUB_RAW_BASE}${path}`; }
+// GITHUB_USER / GITHUB_REPO / GITHUB_BRANCH / GITHUB_RAW_BASE and
+// the githubUrl() helper are already defined in datamodel.js
+// (loaded above). Reuse it here instead of redeclaring — classic
+// <script> tags share one global scope, so a duplicate `const`
+// would throw a SyntaxError and silently kill this whole block.
+function ghUrl(path) { return githubUrl(path); }
 
 // ── DEMO MODEL (real .glb committed to the repo) ────────────────
 // TestModel-optimized.glb lives at the repo root and is used as the
