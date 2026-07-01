@@ -20,7 +20,7 @@ const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITH
 const FALLBACK_ITEMS = [
   {
     id: 'mandir-01',
-    title: 'Mandir 360 View New',
+    title: 'Mandir 360 View',
     category: 'spiritual',
     tag_label: 'Spiritual · Featured',
     image_github_path: 'room_2x.jpeg',              // ← filename of the image as committed to the repo root
