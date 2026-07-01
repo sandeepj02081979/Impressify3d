@@ -29,7 +29,7 @@ const FALLBACK_ITEMS = [
     wallpaper_desc: 'A serene wall-mounted mandir with intricate carvings — perfect as a spiritual desktop backdrop.',
     featured: true,
     wallpaper_res: '4K · 3840×2160',
-    wallpaper_tags: 'Spiritual,Heritage,Detailed',
+    wallpaper_tags: 'Spiritual,Heritage,Detailed,Great',
   },
 
 ];
