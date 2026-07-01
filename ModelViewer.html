@@ -6,7 +6,7 @@
 <title>Impressify3D — 3D Model Viewer</title>
 <meta name="description" content="Explore Impressify3D pieces in full 3D — rotate, zoom and inspect every detail before you order. Upload your own .glb file to preview instantly.">
 <meta property="og:title" content="3D Model Viewer — Impressify3D">
-<meta property="og:image" content="https://drive.google.com/thumbnail?id=1yD0Gfm_zYe1nFTgD9WetmmljOkqDy4SD&sz=w1200">
+<meta property="og:image" content="https://raw.githubusercontent.com/sandeepj02081979/Impressify3d/main/room_2x.jpeg">
 
 <!-- Google model-viewer web component -->
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
@@ -311,7 +311,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px
     <div class="how-strip reveal" style="margin-top:16px;">
       <div class="how-strip-icon">💡</div>
       <div class="how-strip-body">
-        <strong>Adding a real 3D model:</strong> Export your design as <code>.glb</code> from Blender or Fusion 360, upload to Google Drive, add the file ID as <code>model_drive_id</code> in <code>datamodel.js</code>. The viewer will load it automatically. Until then, use the upload button above to preview customer-sent files.
+        <strong>Adding a real 3D model:</strong> Export your design as <code>.glb</code> from Blender or Fusion 360, commit it to the <code>Impressify3d</code> GitHub repo, then add its filename as <code>model_github_path</code> in <code>datamodel.js</code>. The viewer will load it automatically straight from GitHub. Until then, use the upload button above to preview customer-sent files.
       </div>
     </div>
 
@@ -361,15 +361,25 @@ footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px
 
 <script src="datamodel.js"></script>
 <script>
-// ── DEMO MODELS (public domain .glb files for showcase) ───────
-// These are free GLB files hosted publicly so the viewer works
-// right away even before you add your own model_drive_id files.
-// Replace DEMO_GLB with your own Google Drive .glb links later.
+// ── GITHUB REPO CONFIG (asset hosting) ─────────────────────────
+// Images and .glb models are served directly from the GitHub repo
+// via raw.githubusercontent.com instead of Google Drive.
+const GITHUB_USER   = 'sandeepj02081979';
+const GITHUB_REPO   = 'Impressify3d';
+const GITHUB_BRANCH = 'main';
+const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
+function ghUrl(path) { return `${GITHUB_RAW_BASE}${path}`; }
+
+// ── DEMO MODEL (real .glb committed to the repo) ────────────────
+// TestModel-optimized.glb lives at the repo root and is used as the
+// showcase model for every item until per-item model_github_path
+// values are added in datamodel.js.
+const DEFAULT_GLB = 'TestModel-optimized.glb';
 const DEMO_MODELS = {
-  'mandir-01':        'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
-  'text-decor-01':    'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb',
-  'jharokha-01':      'https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb',
-  'circular-temple-01': 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+  'mandir-01':          DEFAULT_GLB,
+  'text-decor-01':      DEFAULT_GLB,
+  'jharokha-01':         DEFAULT_GLB,
+  'circular-temple-01': DEFAULT_GLB,
 };
 
 const WHATSAPP_NUM  = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.whatsapp_number : '';
@@ -404,13 +414,13 @@ async function buildSidebar() {
   list.innerHTML = '';
 
   allItems.forEach(item => {
-    const hasModel = !!item.model_drive_id || !!DEMO_MODELS[item.id];
+    const hasModel = !!item.model_github_path || !!DEMO_MODELS[item.id];
     const el = document.createElement('div');
     el.className = 'model-item';
     el.dataset.id = item.id;
 
-    const thumbSrc = item.image_drive_id
-      ? `https://drive.google.com/thumbnail?id=${item.image_drive_id}&sz=w200`
+    const thumbSrc = item.image_github_path
+      ? ghUrl(item.image_github_path)
       : null;
 
     el.innerHTML = `
@@ -431,7 +441,7 @@ async function buildSidebar() {
   });
 
   // Auto-load first item that has a model
-  const firstWithModel = allItems.find(i => i.model_drive_id || DEMO_MODELS[i.id]);
+  const firstWithModel = allItems.find(i => i.model_github_path || DEMO_MODELS[i.id]);
   if (firstWithModel) {
     const firstEl = list.querySelector(`[data-id="${firstWithModel.id}"]`);
     if (firstEl) loadModel(firstWithModel, firstEl);
@@ -446,13 +456,13 @@ function loadModel(item, listEl) {
   activeItem = item;
 
   // Resolve model URL
-  // Priority: item.model_drive_id → DEMO_MODELS fallback
+  // Priority: item.model_github_path → DEMO_MODELS fallback (e.g. TestModel-optimized.glb)
   let modelUrl = null;
-  if (item.model_drive_id && !item.model_drive_id.startsWith('REPLACE')) {
-    // Google Drive direct download — needs the export=download format
-    modelUrl = `https://drive.google.com/uc?export=download&id=${item.model_drive_id}`;
+  if (item.model_github_path && !item.model_github_path.startsWith('REPLACE')) {
+    // Served straight from the GitHub repo — no conversion needed
+    modelUrl = ghUrl(item.model_github_path);
   } else if (DEMO_MODELS[item.id]) {
-    modelUrl = DEMO_MODELS[item.id];
+    modelUrl = ghUrl(DEMO_MODELS[item.id]);
   }
 
   // Update topbar
@@ -462,7 +472,7 @@ function loadModel(item, listEl) {
   if (!modelUrl) {
     // No 3D model — show image fallback in placeholder
     placeholder.innerHTML = `
-      <img src="https://drive.google.com/thumbnail?id=${item.image_drive_id}&sz=w800"
+      <img src="${ghUrl(item.image_github_path)}"
            style="max-height:70%;max-width:90%;object-fit:contain;border-radius:12px;opacity:.85" alt="${item.title}">
       <p style="margin-top:12px">3D model coming soon — viewing product image.</p>
       <button class="upload-cta" onclick="document.getElementById('file-input').click()">Upload a .glb to preview</button>`;
@@ -625,10 +635,10 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
 // ── INLINE FALLBACK (if data.js not present) ──────────────────
 const FALLBACK_ITEMS_INLINE = [
-  { id:'mandir-01', title:'Wall-Mounted Mandir – Divine Elegance', tag_label:'Spiritual · Featured', image_drive_id:'1yD0Gfm_zYe1nFTgD9WetmmljOkqDy4SD', materials:['PLA+'], price_tier:'₹₹', delivery_days:5, is_customizable:false, gallery_desc:'Intricate carvings with a sacred aura.', is_new:false, added_date:'2025-01-01' },
-  { id:'jharokha-01', title:'Jharokha – The Royal Balcony', tag_label:'Heritage', image_drive_id:'1NaY_dSSJKdX_iXInt6TPlI4jpTdb-K3e', materials:['PLA+'], price_tier:'₹₹', delivery_days:6, is_customizable:false, gallery_desc:'Ornate jali work and geometric patterns.', is_new:false, added_date:'2025-01-01' },
-  { id:'circular-temple-01', title:'Eternal Harmony – The Circular Temple', tag_label:'Spiritual', image_drive_id:'1lTfanT9BYS1eEApfkr1L7Odho8-sDmwc', materials:['Resin'], price_tier:'₹₹₹', delivery_days:7, is_customizable:false, gallery_desc:'Every curve symbolizes balance.', is_new:false, added_date:'2025-01-01' },
-  { id:'text-decor-01', title:'3D Text Decor – Personalized Elegance', tag_label:'Decor · Custom', image_drive_id:'11WB2Lx_R2e-hJutKc4MS6XMjMmgG1qL4', materials:['PLA+','PETG'], price_tier:'₹', delivery_days:4, is_customizable:true, gallery_desc:'Bold lettering as a stylish desk piece.', is_new:false, added_date:'2025-01-01' },
+  { id:'mandir-01', title:'Wall-Mounted Mandir – Divine Elegance', tag_label:'Spiritual · Featured', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:5, is_customizable:false, gallery_desc:'Intricate carvings with a sacred aura.', is_new:false, added_date:'2025-01-01' },
+  { id:'jharokha-01', title:'Jharokha – The Royal Balcony', tag_label:'Heritage', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:6, is_customizable:false, gallery_desc:'Ornate jali work and geometric patterns.', is_new:false, added_date:'2025-01-01' },
+  { id:'circular-temple-01', title:'Eternal Harmony – The Circular Temple', tag_label:'Spiritual', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['Resin'], price_tier:'₹₹₹', delivery_days:7, is_customizable:false, gallery_desc:'Every curve symbolizes balance.', is_new:false, added_date:'2025-01-01' },
+  { id:'text-decor-01', title:'3D Text Decor – Personalized Elegance', tag_label:'Decor · Custom', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+','PETG'], price_tier:'₹', delivery_days:4, is_customizable:true, gallery_desc:'Bold lettering as a stylish desk piece.', is_new:false, added_date:'2025-01-01' },
 ];
 
 function isNewItem(item) {

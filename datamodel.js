@@ -8,6 +8,14 @@
 const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE';  // ← paste your Sheet ID
 const USE_SHEET = false;                         // ← set to true when ready
 
+// ── GITHUB REPO CONFIG ──────────────────────────────────────────
+// Assets (images + .glb models) are served straight from the
+// GitHub repo via raw.githubusercontent.com — no Google Drive needed.
+const GITHUB_USER   = 'sandeepj02081979';
+const GITHUB_REPO   = 'Impressify3d';
+const GITHUB_BRANCH = 'main';
+const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
+
 // ── FALLBACK DATA ─────────────────────────────────────────────
 const FALLBACK_ITEMS = [
   {
@@ -15,22 +23,33 @@ const FALLBACK_ITEMS = [
     title: 'Mandir Lotus Shape',
     category: 'spiritual',
     tag_label: 'Spiritual · Featured',
-    image_drive_id: '1nYr1BErOkvfBg1RAJlPTzMkihgNCdVtw',
+    image_github_path: 'room_2x.jpeg',              // ← filename of the image as committed to the repo root
+    model_github_path: 'TestModel-optimized.glb',    // ← filename of the .glb model as committed to the repo root
     gallery_desc: 'A perfect blend of tradition, craftsmanship, and spirituality. Intricate carvings with a sacred aura — wall-mounted for convenience without sacrificing beauty or devotion. Ideal for daily prayers or meditation.',
     wallpaper_desc: 'A serene wall-mounted mandir with intricate carvings — perfect as a spiritual desktop backdrop.',
     featured: true,
     wallpaper_res: '4K · 3840×2160',
     wallpaper_tags: 'Spiritual,Heritage,Detailed',
   },
-  
+
 ];
 
-// ── IMAGE URL HELPER ──────────────────────────────────────────
-function driveUrl(fileId, size = 'w1200') {
-  if (!fileId || fileId.startsWith('REPLACE')) {
+// ── IMAGE / MODEL URL HELPER ────────────────────────────────────
+// Builds a raw.githubusercontent.com URL for any file committed to
+// the repo (images, .glb models, etc). `path` should be the file's
+// path relative to the repo root, e.g. 'room_2x.jpeg' or
+// 'models/TestModel-optimized.glb'.
+function githubUrl(path) {
+  if (!path || path.startsWith('REPLACE')) {
     return `https://via.placeholder.com/1200x900/f5f5f7/0071e3?text=Image+pending`;
   }
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=${size}`;
+  return `${GITHUB_RAW_BASE}${path}`;
+}
+
+// Kept for backwards compatibility with any code still calling driveUrl().
+// Now simply routes to the GitHub-based helper above.
+function driveUrl(path) {
+  return githubUrl(path);
 }
 
 // ── SHEET FETCHER ─────────────────────────────────────────────
@@ -49,16 +68,17 @@ async function loadItems() {
     return rows.map(row => {
       const cols = row.match(/(".*?"|[^,]+)(?=,|$)/g)?.map(c => c.replace(/^"|"$/g, '').trim()) ?? [];
       return {
-        id:              cols[0] || '',
-        title:           cols[1] || '',
-        category:        cols[2] || '',
-        tag_label:       cols[3] || '',
-        image_drive_id:  cols[4] || '',
-        gallery_desc:    cols[5] || '',
-        wallpaper_desc:  cols[6] || '',
-        featured:        cols[7]?.toLowerCase() === 'true',
-        wallpaper_res:   cols[8] || '4K · 3840×2160',
-        wallpaper_tags:  cols[9] || '',
+        id:                 cols[0] || '',
+        title:              cols[1] || '',
+        category:           cols[2] || '',
+        tag_label:          cols[3] || '',
+        image_github_path:  cols[4] || '',
+        gallery_desc:       cols[5] || '',
+        wallpaper_desc:     cols[6] || '',
+        featured:           cols[7]?.toLowerCase() === 'true',
+        wallpaper_res:      cols[8] || '4K · 3840×2160',
+        wallpaper_tags:     cols[9] || '',
+        model_github_path:  cols[10] || '',
       };
     }).filter(item => item.id);
   } catch (err) {
