@@ -69,15 +69,6 @@ nav a.active{color:var(--ink);font-weight:600;}
 .status-dot.no-model{background:var(--border);}
 .status-label{font-size:10.5px;color:var(--ink-soft);}
 
-/* upload zone */
-.upload-zone{margin:12px 16px;padding:18px;border:1.5px dashed var(--border);border-radius:14px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--orange);background:var(--orange-lt);}
-.upload-icon{font-size:24px;margin-bottom:6px;}
-.upload-text{font-size:12.5px;color:var(--ink-mid);line-height:1.5;}
-.upload-text strong{color:var(--ink);display:block;margin-bottom:2px;}
-.upload-hint{font-size:11px;color:var(--ink-soft);margin-top:4px;}
-#file-input{display:none;}
-
 /* ── PAGE HEADER (above viewer) ── */
 .viewer-topbar{padding:20px clamp(20px,3vw,40px) 0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
 .active-model-name{font-family:var(--display);font-size:clamp(18px,2vw,24px);font-weight:600;letter-spacing:-.02em;color:var(--ink);}
@@ -105,9 +96,6 @@ model-viewer{
 .no-model-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;}
 .no-model-placeholder .big-icon{font-size:56px;opacity:.25;}
 .no-model-placeholder p{font-size:14px;color:var(--ink-soft);text-align:center;max-width:280px;line-height:1.65;}
-.no-model-placeholder .upload-cta{font-size:13px;font-weight:600;color:var(--orange);border:1.5px solid var(--orange);padding:9px 20px;border-radius:100px;cursor:pointer;background:none;font-family:var(--body);transition:background .2s;}
-.no-model-placeholder .upload-cta:hover{background:var(--orange-lt);}
-
 /* loading overlay */
 .viewer-loading{position:absolute;inset:0;background:var(--panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border-radius:20px;z-index:10;transition:opacity .4s;}
 .viewer-loading.hidden{opacity:0;pointer-events:none;}
@@ -206,19 +194,6 @@ footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px
     <div class="model-list" id="model-list">
       <!-- populated by JS -->
     </div>
-
-    <!-- Upload your own -->
-    <div style="padding:0 12px 16px;">
-      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
-        <div class="upload-icon">📁</div>
-        <div class="upload-text">
-          <strong>Upload your own model</strong>
-          Drop a .glb or .gltf file here
-        </div>
-        <div class="upload-hint">Preview before you send it to us</div>
-      </div>
-      <input type="file" id="file-input" accept=".glb,.gltf" />
-    </div>
   </aside>
 
   <!-- ── MAIN CONTENT ── -->
@@ -270,8 +245,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px
         <!-- Placeholder (no model selected) -->
         <div class="no-model-placeholder" id="no-model-placeholder">
           <div class="big-icon">⬡</div>
-          <p>Select a piece from the sidebar to view it in full 3D, or upload your own .glb file.</p>
-          <button class="upload-cta" onclick="document.getElementById('file-input').click()">Upload a model</button>
+          <p>Select a piece from the sidebar to view it in full 3D.</p>
         </div>
 
         <!-- The actual model-viewer -->
@@ -311,7 +285,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px
     <div class="how-strip reveal" style="margin-top:16px;">
       <div class="how-strip-icon">💡</div>
       <div class="how-strip-body">
-        <strong>Adding a real 3D model:</strong> Export your design as <code>.glb</code> from Blender or Fusion 360, commit it to the <code>Impressify3d</code> GitHub repo, then add its filename as <code>model_github_path</code> in <code>datamodel.js</code>. The viewer will load it automatically straight from GitHub. Until then, use the upload button above to preview customer-sent files.
+        <strong>Adding a real 3D model:</strong> Export your design as <code>.glb</code> from Blender or Fusion 360, commit it to the <code>Impressify3d</code> GitHub repo, then add its filename as <code>model_github_path</code> in <code>datamodel.js</code>. The viewer will load it automatically straight from GitHub.
       </div>
     </div>
 
@@ -473,11 +447,19 @@ function loadModel(item, listEl) {
     placeholder.innerHTML = `
       <img src="${ghUrl(item.image_github_path)}"
            style="max-height:70%;max-width:90%;object-fit:contain;border-radius:12px;opacity:.85" alt="${item.title}">
-      <p style="margin-top:12px">3D model coming soon — viewing product image.</p>
-      <button class="upload-cta" onclick="document.getElementById('file-input').click()">Upload a .glb to preview</button>`;
+      <p style="margin-top:12px">3D model coming soon — viewing product image.</p>`;
     mv.style.display = 'none';
     placeholder.style.display = 'flex';
     loading.classList.add('hidden');
+    showDetails(item);
+    return;
+  }
+
+  // If this exact model is already loaded and visible (e.g. re-clicking the
+  // same item), skip the reload entirely. Re-assigning mv.src to an
+  // unchanged URL does NOT re-fire model-viewer's "load" event, so the
+  // loading overlay would otherwise be shown and never get hidden again.
+  if (mv.src === modelUrl && mv.style.display === 'block') {
     showDetails(item);
     return;
   }
@@ -573,57 +555,6 @@ function toggleRotate() {
   mv.autoRotate = autoRotate;
   const track = document.getElementById('rotate-track');
   track.classList.toggle('on', autoRotate);
-}
-
-// ── FILE UPLOAD ───────────────────────────────────────────────
-const fileInput  = document.getElementById('file-input');
-const uploadZone = document.getElementById('upload-zone');
-
-fileInput.addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  handleUploadedFile(file);
-});
-
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && (file.name.endsWith('.glb') || file.name.endsWith('.gltf'))) handleUploadedFile(file);
-});
-
-function handleUploadedFile(file) {
-  const url = URL.createObjectURL(file);
-
-  // Deselect sidebar
-  document.querySelectorAll('.model-item').forEach(el => el.classList.remove('active'));
-  activeItem = null;
-
-  document.getElementById('active-name').textContent = file.name.replace(/\.(glb|gltf)$/, '');
-  document.getElementById('active-tag').textContent  = 'Uploaded model · Preview only';
-  document.getElementById('btn-ar').style.display = 'none';
-
-  mv.style.display = 'none';
-  placeholder.style.display = 'none';
-  loading.classList.remove('hidden');
-  document.getElementById('loader-text').textContent = 'Loading your model…';
-
-  mv.src = url;
-  mv.style.display = 'block';
-
-  // Simple detail card for uploaded file
-  detailsPanel.style.display = 'grid';
-  document.getElementById('spec-rows').innerHTML = `
-    <div class="spec-row"><span class="spec-label">File</span><span class="spec-val" style="font-size:12px;max-width:160px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${file.name}</span></div>
-    <div class="spec-row"><span class="spec-label">Size</span><span class="spec-val">${(file.size / 1024).toFixed(0)} KB</span></div>
-    <div class="spec-row"><span class="spec-label">Type</span><span class="spec-val">${file.name.split('.').pop().toUpperCase()}</span></div>`;
-  document.getElementById('action-title').textContent = 'Want to print this?';
-  document.getElementById('action-sub').textContent   = 'Send us this file and we\'ll review it, confirm printability, and give you a quote within 24 hours.';
-  const num = WHATSAPP_NUM;
-  const msg = encodeURIComponent(`Hi! I have a 3D model file I'd like to print with Impressify3D. File: ${file.name}. Please guide me on the next steps.`);
-  document.getElementById('action-wa').href = (num && !num.includes('X')) ? `https://wa.me/${num}?text=${msg}` : QUOTE_URL;
 }
 
 // ── SCROLL REVEAL ─────────────────────────────────────────────
