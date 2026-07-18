@@ -285,7 +285,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px
     <div class="how-strip reveal" style="margin-top:16px;">
       <div class="how-strip-icon">💡</div>
       <div class="how-strip-body">
-        <strong>Adding a real 3D model:</strong> Export your design as <code>.glb</code> from Blender or Fusion 360, commit it to the <code>Impressify3d</code> GitHub repo, then add its filename as <code>model_github_path</code> in <code>datamodel.js</code>. The viewer will load it automatically straight from GitHub.
+        <strong>Adding a real 3D model:</strong> Export your design as <code>.glb</code> from Blender or Fusion 360, commit it to <code>assets/models/&lt;id&gt;.glb</code> in the repo (matching the product's <code>id</code>), then set <code>has_model: true</code> for that product in <code>data/products.json</code>. The viewer will load it automatically.
       </div>
     </div>
 
