@@ -333,27 +333,11 @@ footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px clamp(24px
   </div>
 </footer>
 
-<script src="datamodel.js"></script>
+<script src="data.js"></script>
 <script>
-// ── GITHUB REPO CONFIG (asset hosting) ─────────────────────────
-// GITHUB_USER / GITHUB_REPO / GITHUB_BRANCH / GITHUB_RAW_BASE and
-// the githubUrl() helper are already defined in datamodel.js
-// (loaded above). Reuse it here instead of redeclaring — classic
-// <script> tags share one global scope, so a duplicate `const`
-// would throw a SyntaxError and silently kill this whole block.
-function ghUrl(path) { return githubUrl(path); }
-
-// ── DEMO MODEL (real .glb committed to the repo) ────────────────
-// TestModel-optimized.glb lives at the repo root and is used as the
-// showcase model for every item until per-item model_github_path
-// values are added in datamodel.js.
-const DEFAULT_GLB = 'TestModel-optimized.glb';
-const DEMO_MODELS = {
-  'mandir-01':          DEFAULT_GLB,
-  'text-decor-01':      DEFAULT_GLB,
-  'jharokha-01':         DEFAULT_GLB,
-  'circular-temple-01': DEFAULT_GLB,
-};
+// Image/model URLs are resolved by data.js (assets/images/<id>.jpg,
+// assets/models/<id>.glb) and already attached to each item as
+// item.image / item.model — no per-page path helper needed.
 
 const WHATSAPP_NUM  = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.whatsapp_number : '';
 const QUOTE_URL     = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.quote_form_url  : '#';
@@ -387,14 +371,12 @@ async function buildSidebar() {
   list.innerHTML = '';
 
   allItems.forEach(item => {
-    const hasModel = !!item.model_github_path || !!DEMO_MODELS[item.id];
+    const hasModel = !!item.model;
     const el = document.createElement('div');
     el.className = 'model-item';
     el.dataset.id = item.id;
 
-    const thumbSrc = item.image_github_path
-      ? ghUrl(item.image_github_path)
-      : null;
+    const thumbSrc = item.image || null;
 
     el.innerHTML = `
       ${thumbSrc
@@ -414,7 +396,7 @@ async function buildSidebar() {
   });
 
   // Auto-load first item that has a model
-  const firstWithModel = allItems.find(i => i.model_github_path || DEMO_MODELS[i.id]);
+  const firstWithModel = allItems.find(i => i.model);
   if (firstWithModel) {
     const firstEl = list.querySelector(`[data-id="${firstWithModel.id}"]`);
     if (firstEl) loadModel(firstWithModel, firstEl);
@@ -428,15 +410,9 @@ function loadModel(item, listEl) {
   listEl.classList.add('active');
   activeItem = item;
 
-  // Resolve model URL
-  // Priority: item.model_github_path → DEMO_MODELS fallback (e.g. TestModel-optimized.glb)
-  let modelUrl = null;
-  if (item.model_github_path && !item.model_github_path.startsWith('REPLACE')) {
-    // Served straight from the GitHub repo — no conversion needed
-    modelUrl = ghUrl(item.model_github_path);
-  } else if (DEMO_MODELS[item.id]) {
-    modelUrl = ghUrl(DEMO_MODELS[item.id]);
-  }
+  // Resolve model URL — data.js already attaches assets/models/<id>.glb
+  // when has_model is true in products.json
+  const modelUrl = item.model || null;
 
   // Update topbar
   document.getElementById('active-name').textContent = item.title;
@@ -445,7 +421,7 @@ function loadModel(item, listEl) {
   if (!modelUrl) {
     // No 3D model — show image fallback in placeholder
     placeholder.innerHTML = `
-      <img src="${ghUrl(item.image_github_path)}"
+      <img src="${item.image}"
            style="max-height:70%;max-width:90%;object-fit:contain;border-radius:12px;opacity:.85" alt="${item.title}">
       <p style="margin-top:12px">3D model coming soon — viewing product image.</p>`;
     mv.style.display = 'none';
@@ -565,10 +541,10 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
 // ── INLINE FALLBACK (if data.js not present) ──────────────────
 const FALLBACK_ITEMS_INLINE = [
-  { id:'mandir-01', title:'Wall-Mounted Mandir – Divine Elegance', tag_label:'Spiritual · Featured', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:5, is_customizable:false, gallery_desc:'Intricate carvings with a sacred aura.', is_new:false, added_date:'2025-01-01' },
-  { id:'jharokha-01', title:'Jharokha – The Royal Balcony', tag_label:'Heritage', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:6, is_customizable:false, gallery_desc:'Ornate jali work and geometric patterns.', is_new:false, added_date:'2025-01-01' },
-  { id:'circular-temple-01', title:'Eternal Harmony – The Circular Temple', tag_label:'Spiritual', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['Resin'], price_tier:'₹₹₹', delivery_days:7, is_customizable:false, gallery_desc:'Every curve symbolizes balance.', is_new:false, added_date:'2025-01-01' },
-  { id:'text-decor-01', title:'3D Text Decor – Personalized Elegance', tag_label:'Decor · Custom', image_github_path:'room_2x.jpeg', model_github_path:'TestModel-optimized.glb', materials:['PLA+','PETG'], price_tier:'₹', delivery_days:4, is_customizable:true, gallery_desc:'Bold lettering as a stylish desk piece.', is_new:false, added_date:'2025-01-01' },
+  { id:'mandir-01', title:'Wall-Mounted Mandir – Divine Elegance', tag_label:'Spiritual · Featured', image:'assets/images/mandir-01.jpg', model:'assets/models/mandir-01.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:5, is_customizable:false, gallery_desc:'Intricate carvings with a sacred aura.', is_new:false, added_date:'2025-01-01' },
+  { id:'jharokha-01', title:'Jharokha – The Royal Balcony', tag_label:'Heritage', image:'assets/images/jharokha-01.jpg', model:null, materials:['PLA+'], price_tier:'₹₹', delivery_days:6, is_customizable:false, gallery_desc:'Ornate jali work and geometric patterns.', is_new:false, added_date:'2025-01-01' },
+  { id:'circular-temple-01', title:'Eternal Harmony – The Circular Temple', tag_label:'Spiritual', image:'assets/images/circular-temple-01.jpg', model:null, materials:['Resin'], price_tier:'₹₹₹', delivery_days:7, is_customizable:false, gallery_desc:'Every curve symbolizes balance.', is_new:false, added_date:'2025-01-01' },
+  { id:'text-decor-01', title:'3D Text Decor – Personalized Elegance', tag_label:'Decor · Custom', image:'assets/images/text-decor-01.jpg', model:null, materials:['PLA+','PETG'], price_tier:'₹', delivery_days:4, is_customizable:true, gallery_desc:'Bold lettering as a stylish desk piece.', is_new:false, added_date:'2025-01-01' },
 ];
 
 function isNewItem(item) {
