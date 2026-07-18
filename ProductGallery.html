@@ -26,7 +26,6 @@
   html { scroll-behavior: smooth; }
   body { font-family: var(--font); color: var(--black); background: var(--white); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
-  /* ── NAV ── */
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; background: rgba(255,255,255,0.85); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 0.5px solid rgba(0,0,0,0.12); }
   .nav-logo { font-size: 17px; font-weight: 600; color: var(--black); letter-spacing: -0.02em; text-decoration: none; }
   .nav-links { display: flex; gap: 28px; list-style: none; }
@@ -36,7 +35,6 @@
   .nav-cta { font-size: 13px; background: var(--blue); color: white; padding: 7px 16px; border-radius: 980px; text-decoration: none; font-weight: 500; transition: background 0.2s; }
   .nav-cta:hover { background: var(--blue-hover); }
 
-  /* ── PAGE HERO ── */
   .page-hero { padding: 120px 24px 72px; text-align: center; background: var(--white); }
   .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 18px; }
   .page-hero h1 { font-size: clamp(38px, 6vw, 72px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.0; color: var(--black); max-width: 760px; margin: 0 auto 20px; }
@@ -44,14 +42,12 @@
   .btn-primary { font-family: var(--font); font-size: 16px; font-weight: 500; background: var(--blue); color: white; border: none; padding: 13px 26px; border-radius: 980px; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s, transform 0.15s; }
   .btn-primary:hover { background: var(--blue-hover); transform: scale(1.01); }
 
-  /* ── FILTER BAR ── */
   .filter-bar { background: var(--gray-light); border-top: 0.5px solid var(--gray-border); border-bottom: 0.5px solid var(--gray-border); padding: 0 24px; display: flex; align-items: center; justify-content: center; gap: 6px; overflow-x: auto; scrollbar-width: none; }
   .filter-bar::-webkit-scrollbar { display: none; }
   .filter-btn { font-family: var(--font); font-size: 13px; font-weight: 500; color: var(--gray-mid); background: transparent; border: none; padding: 14px; cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; }
   .filter-btn:hover { color: var(--black); }
   .filter-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
 
-  /* ── GALLERY SECTION ── */
   .gallery-section { padding: 64px 24px 100px; max-width: 1100px; margin: 0 auto; }
   .gallery-count { font-size: 13px; color: var(--gray-mid); margin-bottom: 36px; display: block; }
 
@@ -59,7 +55,6 @@
   .loading-dots::after { content: ''; animation: dots 1.2s steps(3,end) infinite; }
   @keyframes dots { 0%,20%{content:'.'} 40%{content:'..'} 60%,100%{content:'...'} }
 
-  /* ── FEATURED ── */
   .gallery-featured { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2px; background: var(--gray-border); border: 1px solid var(--gray-border); border-radius: 20px; overflow: hidden; margin-bottom: 2px; }
   .gallery-featured-img { aspect-ratio: 4/3; overflow: hidden; background: var(--gray-light); position: relative; }
   .gallery-featured-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
@@ -84,7 +79,6 @@
   .item-wa { font-size: 13px; font-weight: 500; color: #fff; background: #25d366; text-decoration: none; padding: 8px 16px; border-radius: 980px; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; }
   .item-wa:hover { background: #1da851; }
 
-  /* ── GRID CARDS ── */
   .gallery-grid, .gallery-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; border: 1px solid var(--gray-border); border-radius: 20px; overflow: hidden; margin-bottom: 2px; background: var(--white); }
 
   .gallery-card {
@@ -108,16 +102,13 @@
   .card-quote { font-size: 12px; font-weight: 500; color: var(--blue); background: var(--gray-light); text-decoration: none; padding: 6px 13px; border-radius: 980px; border: 1px solid var(--gray-border); transition: background 0.2s; }
   .card-quote:hover { background: var(--gray-border); }
 
-  /* absolute badges on images */
   .img-badge-new { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; background: var(--green); color: #fff; padding: 3px 9px; border-radius: 980px; z-index: 2; }
 
-  /* ── CTA STRIP ── */
   .cta-strip { background: var(--black); text-align: center; padding: 100px 24px; }
   .cta-strip .hero-eyebrow { color: #86b9ff; }
   .cta-strip h2 { font-size: clamp(28px,4vw,52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: white; max-width: 640px; margin: 12px auto 20px; }
   .cta-strip p { font-size: 18px; color: rgba(255,255,255,0.6); max-width: 540px; margin: 0 auto 40px; line-height: 1.55; }
 
-  /* ── FOOTER ── */
   footer { background: var(--gray-light); border-top: 0.5px solid var(--gray-border); padding: 40px 24px; }
   .footer-inner { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
   @media (max-width: 680px) { .footer-inner { grid-template-columns: 1fr 1fr; } .nav-links { display: none; } }
@@ -193,7 +184,7 @@
     <div>
       <p class="footer-col-title">Contact</p>
       <ul class="footer-links">
-        <li><a href="mailto:impressify3d@gmail.com">impressify3d@gmail.com</a></li>
+        <li><a href="/cdn-cgi/l/email-protection#a8c1c5d8dacddbdbc1ced19bcce8cfc5c9c1c486cbc7c5"><span class="__cf_email__" data-cfemail="a9c0c4d9dbccdadac0cfd09acde9cec4c8c0c587cac6c4">[email&#160;protected]</span></a></li>
         <li><a href="https://docs.google.com/forms/d/1dwelCNUBreJLfpcdp6720Z2w5Ib5FjjMwWMVLIKl73s/edit" target="_blank">Request a Quote</a></li>
       </ul>
     </div>
@@ -204,7 +195,7 @@
   </div>
 </footer>
 
-<script src="data.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="data.js"></script>
 <script>
 (async () => {
   const root      = document.getElementById('gallery-root');
@@ -213,7 +204,6 @@
 
   const allItems = await loadItems();
 
-  // Build filter tabs from categories present in data
   const allCats = new Set();
   allItems.forEach(item => item.categories.forEach(c => allCats.add(c)));
   allCats.forEach(cat => {
@@ -224,7 +214,6 @@
     filterBar.appendChild(btn);
   });
 
-  // ── BADGE HELPERS ───────────────────────────────────────────
   function newBadge(item) {
     return isNewItem(item) ? `<span class="img-badge-new">New</span>` : '';
   }
@@ -235,7 +224,6 @@
     return mats + price;
   }
 
-  // ── ACTION BUTTONS ──────────────────────────────────────────
   function cardActions(item, large = false) {
     const wa     = whatsappLink(item);
     const quote  = SITE_CONFIG.quote_form_url;
@@ -259,7 +247,6 @@
       </div>`;
   }
 
-  // ── RENDER ──────────────────────────────────────────────────
   function render(items) {
     root.innerHTML = '';
     if (!items.length) {
@@ -284,7 +271,6 @@
 
     requestAnimationFrame(() => {
       document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-      // Fix bottom borders on card rows
       fixLastRowBorders();
     });
   }
@@ -310,7 +296,7 @@
       <div class="gallery-card" data-category="${cats}">
         <div class="gallery-card-img">
           ${newBadge(item)}
-          <img src="${driveUrl(item.image_drive_id, 'w800')}" alt="${item.title}" loading="lazy">
+          <img src="${item.image}" alt="${item.title}" loading="lazy">
         </div>
         <div class="gallery-card-body">
           <p class="gallery-card-tag">${item.tag_label}</p>
@@ -341,7 +327,7 @@
     const imgBlock = `
       <div class="gallery-featured-img">
         ${newBadge(item)}
-        <img src="${driveUrl(item.image_drive_id, 'w1200')}" alt="${item.title}" loading="lazy">
+        <img src="${item.image}" alt="${item.title}" loading="lazy">
       </div>`;
     const infoBlock = `
       <div class="gallery-featured-info${flip ? ' flip' : ''}">
@@ -358,7 +344,6 @@
     return wrap;
   }
 
-  // ── FILTERS ─────────────────────────────────────────────────
   let activeFilter = 'all';
   filterBar.addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
