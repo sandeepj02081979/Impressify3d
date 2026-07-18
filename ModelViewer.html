@@ -13,14 +13,14 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --bg:#FAFAF8; --surface:#FFFFFF; --panel:#F2F1ED;
-  --border:#E5E4DF; --ink:#1A1A1C; --ink-mid:#6B6B70; --ink-soft:#9A9A9F;
-  --orange:#E8501A; --orange-lt:#FFF0EB; --orange-dk:#cc4315;
-  --green:#1d8348; --display:'Space Grotesk',sans-serif; --body:'Inter',sans-serif;
+  --bg:#FFFFFF; --surface:#FFFFFF; --panel:#F5F5F7;
+  --border:#D2D2D7; --ink:#1D1D1F; --ink-mid:#6E6E73; --ink-soft:#86868B;
+  --orange:#0071E3; --orange-lt:#E8F2FE; --orange-dk:#0077ED;
+  --green:#1d8348; --display:'Inter',sans-serif; --body:'Inter',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -541,10 +541,10 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
 // ── INLINE FALLBACK (if data.js not present) ──────────────────
 const FALLBACK_ITEMS_INLINE = [
-  { id:'mandir-01', title:'Wall-Mounted Mandir – Divine Elegance', tag_label:'Spiritual · Featured', image:'assets/images/mandir-01.png', model:'assets/models/mandir-01.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:5, is_customizable:false, gallery_desc:'Intricate carvings with a sacred aura.', is_new:false, added_date:'2025-01-01' },
-  { id:'jharokha-01', title:'Jharokha – The Royal Balcony', tag_label:'Heritage', image:'assets/images/jharokha-01.png', model:null, materials:['PLA+'], price_tier:'₹₹', delivery_days:6, is_customizable:false, gallery_desc:'Ornate jali work and geometric patterns.', is_new:false, added_date:'2025-01-01' },
-  { id:'circular-temple-01', title:'Eternal Harmony – The Circular Temple', tag_label:'Spiritual', image:'assets/images/circular-temple-01.png', model:null, materials:['Resin'], price_tier:'₹₹₹', delivery_days:7, is_customizable:false, gallery_desc:'Every curve symbolizes balance.', is_new:false, added_date:'2025-01-01' },
-  { id:'text-decor-01', title:'3D Text Decor – Personalized Elegance', tag_label:'Decor · Custom', image:'assets/images/text-decor-01.png', model:null, materials:['PLA+','PETG'], price_tier:'₹', delivery_days:4, is_customizable:true, gallery_desc:'Bold lettering as a stylish desk piece.', is_new:false, added_date:'2025-01-01' },
+  { id:'mandir-01', title:'Wall-Mounted Mandir – Divine Elegance', tag_label:'Spiritual · Featured', image:'assets/images/mandir-01.jpg', model:'assets/models/mandir-01.glb', materials:['PLA+'], price_tier:'₹₹', delivery_days:5, is_customizable:false, gallery_desc:'Intricate carvings with a sacred aura.', is_new:false, added_date:'2025-01-01' },
+  { id:'jharokha-01', title:'Jharokha – The Royal Balcony', tag_label:'Heritage', image:'assets/images/jharokha-01.jpg', model:null, materials:['PLA+'], price_tier:'₹₹', delivery_days:6, is_customizable:false, gallery_desc:'Ornate jali work and geometric patterns.', is_new:false, added_date:'2025-01-01' },
+  { id:'circular-temple-01', title:'Eternal Harmony – The Circular Temple', tag_label:'Spiritual', image:'assets/images/circular-temple-01.jpg', model:null, materials:['Resin'], price_tier:'₹₹₹', delivery_days:7, is_customizable:false, gallery_desc:'Every curve symbolizes balance.', is_new:false, added_date:'2025-01-01' },
+  { id:'text-decor-01', title:'3D Text Decor – Personalized Elegance', tag_label:'Decor · Custom', image:'assets/images/text-decor-01.jpg', model:null, materials:['PLA+','PETG'], price_tier:'₹', delivery_days:4, is_customizable:true, gallery_desc:'Bold lettering as a stylish desk piece.', is_new:false, added_date:'2025-01-01' },
 ];
 
 function isNewItem(item) {
