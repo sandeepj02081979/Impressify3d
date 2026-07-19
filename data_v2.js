@@ -1,16 +1,17 @@
 /**
  * Impressify3D — Shared Content Layer
- * Content lives in data/products.csv + data/site.csv — see MAINTENANCE.md.
- * Images/models still live in /assets/ on GitHub, matched by the CSV's `id` column:
+ * Content now lives in a Google Sheet (not JSON files) — see MAINTENANCE.md.
+ * Images/models still live in /assets/ on GitHub, matched by the sheet's `id` column:
  *   1. Drop image at  /assets/images/<id>.jpg  (1200px wide, <300KB)
  *   2. Drop model at  /assets/models/<id>.glb   (optional, set has_model = TRUE)
- *   3. Add a row to data/products.csv.
- * If the CSV is ever missing/broken, falls back to
+ *   3. Add a row to the Products sheet.
+ * If the sheet can't be reached (offline, URL not set yet), falls back to
  * /data/products.json + /data/site.json so the site never breaks.
  */
 
-const PRODUCTS_CSV_URL = 'data/products.csv';
-const SITE_CSV_URL = 'data/site.csv';
+// Replace these with your own published-CSV links (see MAINTENANCE.md step 3).
+const PRODUCTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/PASTE_YOUR_SHEET_ID/pub?gid=0&single=true&output=csv';
+const SITE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/PASTE_YOUR_SHEET_ID/pub?gid=1&single=true&output=csv';
 
 let SITE_CONFIG = {};
 let PRODUCTS = [];
@@ -46,12 +47,12 @@ const toBool = v => /^(true|yes|1)$/i.test(v);
 const toList = v => v ? v.split(',').map(s => s.trim()).filter(Boolean) : [];
 
 async function fetchCSV(url) {
-  const res = await fetch(url);
+  const res = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now());
   if (!res.ok) throw new Error('CSV fetch failed: ' + res.status);
   return parseCSV(await res.text());
 }
 
-async function loadFromCSV() {
+async function loadFromSheets() {
   const [siteRows, productRows] = await Promise.all([
     fetchCSV(SITE_CSV_URL),
     fetchCSV(PRODUCTS_CSV_URL),
@@ -92,10 +93,10 @@ async function loadFromJSONFallback() {
 async function loadSiteData() {
   let site, products;
   try {
-    ({ site, products } = await loadFromCSV());
-    if (!products.length) throw new Error('CSV returned no products');
+    ({ site, products } = await loadFromSheets());
+    if (!products.length) throw new Error('Sheet returned no products');
   } catch (err) {
-    console.warn('Falling back to local JSON (CSV unavailable):', err.message);
+    console.warn('Falling back to local JSON (Sheet unavailable):', err.message);
     ({ site, products } = await loadFromJSONFallback());
   }
   SITE_CONFIG = site;
